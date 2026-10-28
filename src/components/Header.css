@@ -1,0 +1,77 @@
+.globalnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  height: 44px;
+  border-bottom: none;
+}
+
+@media (max-width: 833px) {
+  .globalnav {
+    height: 48px;
+  }
+}
+
+.globalnav-content {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 22px;
+  height: 100%;
+}
+
+.globalnav-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.globalnav-item {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.globalnav-link {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  padding: 0 8px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 833px) {
+  .globalnav-link {
+    font-size: 14px;
+    height: 48px;
+  }
+}
+
+.globalnav-link:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.globalnav-link svg {
+  fill: currentColor;
+}
+
+.globalnav-item-apple .globalnav-link {
+  padding: 0 10px;
+}

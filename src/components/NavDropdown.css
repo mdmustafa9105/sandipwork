@@ -1,0 +1,116 @@
+.nav-dropdown {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  background: #161617;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  max-height: calc(100vh - 44px);
+  overflow-y: auto;
+}
+
+@media (max-width: 833px) {
+  .nav-dropdown {
+    top: 48px;
+    max-height: calc(100vh - 48px);
+  }
+}
+
+.nav-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown-backdrop {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9997;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+@media (max-width: 833px) {
+  .nav-dropdown-backdrop {
+    top: 48px;
+  }
+}
+
+.nav-dropdown-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-dropdown-content {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 40px 22px 60px;
+  display: flex;
+  gap: 80px;
+}
+
+.nav-dropdown-section {
+  min-width: 140px;
+}
+
+.nav-dropdown-section-title {
+  font-size: 12px;
+  color: #86868b;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.nav-dropdown-list {
+  list-style: none;
+}
+
+.nav-dropdown-list li {
+  margin: 6px 0;
+}
+
+.nav-dropdown-link {
+  color: #e8e8ed;
+  font-size: 24px;
+  line-height: 1.1666666667;
+  font-weight: 600;
+  letter-spacing: 0.009em;
+  text-decoration: none;
+  font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  display: inline-block;
+}
+
+.nav-dropdown-link:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nav-dropdown-link-small {
+  font-size: 12px;
+  line-height: 1.3333733333;
+  font-weight: 400;
+  color: #e8e8ed;
+  font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.nav-dropdown-link-small:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.nav-dropdown-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
