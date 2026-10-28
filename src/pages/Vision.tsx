@@ -1,12 +1,22 @@
 import './Page.css'
+import './ProductPage.css'
 
 const Vision = () => {
   return (
-    <div className="page">
-      <section className="page-hero">
-        <div className="page-hero-content">
-          <h1 className="page-hero-title">Apple Vision Pro</h1>
-          <p className="page-hero-subtitle">Welcome to spatial computing.</p>
+    <div className="page product-page">
+      <section className="product-hero">
+        <div className="product-hero-content">
+          <div className="product-hero-text">
+            <h1 className="product-hero-title">Apple Vision Pro</h1>
+            <p className="product-hero-subtitle">Welcome to the era of spatial computing.</p>
+            <div className="product-hero-ctas">
+              <a href="/us/shop/goto/buy_vision" className="product-hero-cta">Buy</a>
+              <a href="/apple-vision-pro" className="product-hero-cta">Learn more</a>
+            </div>
+          </div>
+          <div className="product-hero-image">
+            <img src="/images/vision/vision_pro.jpg" alt="Apple Vision Pro" />
+          </div>
         </div>
       </section>
     </div>
