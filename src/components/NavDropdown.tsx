@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import './NavDropdown.css'
 
 interface NavDropdownProps {
@@ -127,7 +129,7 @@ const NavDropdown = ({ isOpen, activeMenu, onClose }: NavDropdownProps) => {
                 {section.links.map((link: any, linkIdx: number) => (
                   <li key={linkIdx}>
                     <Link 
-                      to={link.path} 
+                      href={link.path} 
                       className={idx === 0 && section.links.length > 4 ? 'nav-dropdown-link' : 'nav-dropdown-link nav-dropdown-link-small'}
                       onClick={onClose}
                     >
