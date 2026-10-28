@@ -1,7 +1,7 @@
 import './Page.css'
 import './ProductPage.css'
 
-const iPhone = () => {
+const IPhone = () => {
   return (
     <div className="page product-page">
       <section className="product-hero">
@@ -23,4 +23,4 @@ const iPhone = () => {
   )
 }
 
-export default iPhone
+export default IPhone

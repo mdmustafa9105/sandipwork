@@ -5,7 +5,6 @@ import './Header.css'
 
 const Header = () => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleMouseEnter = (menu: string) => {
     setActiveMenu(menu)

@@ -3,8 +3,8 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Mac from './pages/Mac'
-import iPad from './pages/iPad'
-import iPhone from './pages/iPhone'
+import IPad from './pages/iPad'
+import IPhone from './pages/iPhone'
 import Watch from './pages/Watch'
 import AirPods from './pages/AirPods'
 import Vision from './pages/Vision'
@@ -23,8 +23,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/mac" element={<Mac />} />
-          <Route path="/ipad" element={<iPad />} />
-          <Route path="/iphone" element={<iPhone />} />
+          <Route path="/ipad" element={<IPad />} />
+          <Route path="/iphone" element={<IPhone />} />
           <Route path="/watch" element={<Watch />} />
           <Route path="/airpods" element={<AirPods />} />
           <Route path="/apple-vision-pro" element={<Vision />} />
