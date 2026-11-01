@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useEffect, useState, useRef } from "react";
 import {
   type MotionStyle,
   motion,
@@ -100,6 +101,31 @@ const SiriOrb: React.FC<SiriOrbProps> = ({
   const shouldReduceMotion = useReducedMotion();
   const amplitudeValue = useAmplitudeValue(amplitude);
   const stateMotion = getAIStateMotion(state);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsPaused(document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) {
+          setIsPaused(!entry.isIntersecting || document.hidden);
+        }
+      },
+      { rootMargin: "60px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   /**
    * Higher chroma than the original pastels.
@@ -236,7 +262,8 @@ const SiriOrb: React.FC<SiriOrbProps> = ({
     // motif have to live in a wrapper rather than inside it.
     <motion.div
       animate={getRootAnimate()}
-      className={cn("relative", className)}
+      className={cn("relative max-w-full", className)}
+      ref={containerRef}
       style={
         {
           "--orb-size": size,
@@ -259,7 +286,7 @@ const SiriOrb: React.FC<SiriOrbProps> = ({
       />
 
       <motion.div
-        className="siri-orb"
+        className={cn("siri-orb", (isPaused || shouldReduceMotion) && "is-paused")}
         style={
           {
             "--animation-duration": `${loopDuration}s`,
@@ -416,6 +443,18 @@ const SiriOrb: React.FC<SiriOrbProps> = ({
             black var(--mask-radius),
             transparent 75%
           );
+        }
+
+        .siri-orb.is-paused::before,
+        .siri-orb.is-paused .siri-orb-sheen {
+          animation-play-state: paused !important;
+        }
+
+        @media (max-width: 767px) {
+          .siri-orb::after {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
         }
 
         @keyframes rotate {

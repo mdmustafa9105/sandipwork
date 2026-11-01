@@ -61,6 +61,13 @@
     padding: 0;
   }
 
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100%;
+    overscroll-behavior-x: none;
+  }
+
   html {
     scroll-behavior: smooth;
     color-scheme: light;
@@ -72,7 +79,12 @@
     font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 
@@ -88,6 +100,7 @@
 .hero-grid-lines {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
   z-index: 0;
   background-image: 
@@ -103,6 +116,21 @@
   .hero-grid-lines {
     -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 65%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.6) 35%, rgba(0, 0, 0, 0) 80%);
     mask-image: radial-gradient(ellipse 75% 60% at 50% 65%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.6) 35%, rgba(0, 0, 0, 0) 80%);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-grid-lines {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Remove backdrop-filter blur from everything on mobile except the nav bar */
+  *:not(nav):not(nav *) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 }
 

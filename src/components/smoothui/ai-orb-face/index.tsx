@@ -307,6 +307,13 @@ const AIOrbFace = ({
     if (!gaze || shouldReduceMotion || isThinking || !eyesOpen) {
       return;
     }
+    // Disable cursor-gaze tracking on touch devices
+    const isFinePointer = typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!isFinePointer) {
+      gazeX.set(0);
+      gazeY.set(0);
+      return;
+    }
     const handle = (event: PointerEvent) => {
       const svg = svgRef.current;
       if (!svg) {

@@ -98,6 +98,8 @@ const CoverflowCarousel = ({
     total,
   ]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleVisibility = () => {
       setIsPaused(document.hidden);
@@ -106,6 +108,16 @@ const CoverflowCarousel = ({
     document.addEventListener("visibilitychange", handleVisibility);
     return () =>
       document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry) setIsPaused(!entry.isIntersecting || document.hidden);
+    }, { threshold: 0.1 });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -143,24 +155,25 @@ const CoverflowCarousel = ({
     <div
       aria-label="Coverflow carousel"
       aria-roledescription="carousel"
-      className={cn("relative w-full select-none outline-none", className)}
+      className={cn("relative w-full max-w-full overflow-hidden select-none outline-none", className)}
       onBlur={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      ref={containerRef}
       role="region"
-      style={{ perspective: shouldReduceMotion ? undefined : 1200 }}
+      style={{ perspective: shouldReduceMotion ? undefined : 1200, touchAction: "pan-y" }}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: this WAI-ARIA APG carousel widget intentionally accepts focus so ArrowLeft/ArrowRight can move slides while the region is focused (in addition to the Previous/Next buttons below); removing tabIndex would remove that keyboard-navigation path entirely.
       tabIndex={0}
     >
       <motion.div
-        className="relative mx-auto flex h-[320px] items-center justify-center"
+        className="relative mx-auto flex h-[320px] max-w-full items-center justify-center overflow-hidden"
         drag={total > 1 && !shouldReduceMotion ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.12}
         onDragEnd={(event, info) => dragEndRef.current(event, info)}
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ transformStyle: "preserve-3d", touchAction: "pan-y" }}
       >
         {items.map((item, i) => {
           const offset = i - activeIndex;
@@ -193,7 +206,7 @@ const CoverflowCarousel = ({
                     }
               }
               aria-hidden={!isActive}
-              className="absolute h-[220px] w-[280px] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-xl"
+              className="absolute h-[220px] w-[280px] max-w-[calc(100vw-48px)] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-none"
               key={item.id}
               style={{
                 transformStyle: "preserve-3d",

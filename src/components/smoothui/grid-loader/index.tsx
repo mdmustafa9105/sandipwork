@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // Grid matrix type: 3x3 array of 0s and 1s
 export type GridMatrix = [
@@ -622,6 +622,7 @@ const GridCell = ({
   return (
     <motion.div
       animate={mode === "stagger" ? staggerAnimation : pulseAnimation}
+      className="will-change-[transform,opacity]"
       style={{
         backgroundColor: color,
         borderRadius,
@@ -659,13 +660,35 @@ const GridLoader = ({
 }: GridLoaderProps) => {
   const shouldReduceMotion = useReducedMotion();
   const [sequenceIndex, setSequenceIndex] = useState(0);
+  const containerRef = useRef<HTMLOutputElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsPaused(document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry) {
+        setIsPaused(!entry.isIntersecting || document.hidden);
+      }
+    }, { rootMargin: "60px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const sizeInPx = resolveSize(size);
   const gapSize = gapProp ?? 0;
   const cellSize = (sizeInPx - gapSize * 2) / 3;
   const resolvedColor = resolveColor(color);
   const cycleDuration = SPEEDS[speed] ?? SPEEDS.normal;
-  const disableAnimation = isStatic || shouldReduceMotion;
+  const disableAnimation = isStatic || shouldReduceMotion || isPaused;
 
   // Handle sequence mode
   useEffect(() => {
@@ -725,6 +748,7 @@ const GridLoader = ({
     <output
       aria-label="Loading"
       className={cn("grid grid-cols-3", className)}
+      ref={containerRef}
       style={{
         filter: blur ? `blur(${blur}px)` : undefined,
         gap: gapSize,

@@ -504,21 +504,13 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
       gl.uniform3f(u.light, c.lightX, c.lightY, LIGHT_Z);
     };
 
-    const resize = (entry?: ResizeObserverEntry) => {
-      const box = entry?.devicePixelContentBoxSize;
-      let w: number;
-      let h: number;
-      if (box?.length) {
-        w = box[0].inlineSize;
-        h = box[0].blockSize;
-      } else {
-        const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-        const rect = canvas.getBoundingClientRect();
-        w = Math.round(rect.width * dpr);
-        h = Math.round(rect.height * dpr);
-      }
-      w = Math.max(1, w);
-      h = Math.max(1, h);
+    const resize = () => {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const maxDpr = isMobile ? 1.5 : MAX_DPR;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width * dpr));
+      const h = Math.max(1, Math.round(rect.height * dpr));
       if (canvas.width === w && canvas.height === h) {
         return false;
       }
@@ -560,7 +552,7 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
     };
 
     const start = () => {
-      if (running || reduce.matches || config.current.paused || !onScreen) {
+      if (running || reduce.matches || config.current.paused || !onScreen || document.hidden) {
         return;
       }
       running = true;
@@ -578,7 +570,7 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
     };
 
     const applyMotionPreference = () => {
-      if (reduce.matches || config.current.paused) {
+      if (reduce.matches || config.current.paused || document.hidden) {
         stop();
         if (reduce.matches) {
           gl.uniform1f(u.phase, 0);
@@ -588,6 +580,15 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
       }
       start();
     };
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else if (onScreen && !reduce.matches && !config.current.paused) {
+        start();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     syncConfig.current = () => {
       pushConfig();
@@ -602,23 +603,19 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
     gl.uniform1f(u.phase, 0);
     draw();
 
-    const observer = new ResizeObserver((entries) => {
-      if (resize(entries[0]) && !running) {
+    const observer = new ResizeObserver(() => {
+      if (resize() && !running) {
         draw();
       }
     });
-    try {
-      observer.observe(canvas, { box: "device-pixel-content-box" });
-    } catch {
-      observer.observe(canvas);
-    }
+    observer.observe(canvas);
 
     /* Scrolled out of view is the common case. Nothing is gained by burning
        GPU on an orb nobody can see. */
     const seen = new IntersectionObserver(
       (entries) => {
         onScreen = entries.at(-1)?.isIntersecting ?? true;
-        if (onScreen) {
+        if (onScreen && !document.hidden) {
           start();
         } else {
           stop();
@@ -637,6 +634,7 @@ export default function Orb({ className, size = 240, ...rest }: OrbProps) {
       observer.disconnect();
       seen.disconnect();
       reduce.removeEventListener("change", applyMotionPreference);
+      document.removeEventListener("visibilitychange", handleVisibility);
       gl.deleteProgram(program);
       /* Deliberately NOT calling WEBGL_lose_context here. React remounts
          effects in development, and the second pass gets the same canvas back

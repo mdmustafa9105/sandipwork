@@ -198,15 +198,19 @@ export default function TiltCard({
 
   return (
     <motion.div
-      className={cn("relative", className)}
+      className={cn("relative max-w-full", className)}
       ref={containerRef}
-      style={{
-        rotateX: springRotateX,
-        rotateY: springRotateY,
-        scale: springScale,
-        transformPerspective: perspective,
-        transformStyle: "preserve-3d",
-      }}
+      style={
+        isInteractive
+          ? {
+              rotateX: springRotateX,
+              rotateY: springRotateY,
+              scale: springScale,
+              transformPerspective: perspective,
+              transformStyle: "preserve-3d",
+            }
+          : undefined
+      }
       {...interactiveHandlers}
     >
       {children}

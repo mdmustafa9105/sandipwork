@@ -10,7 +10,7 @@ import {
   useTransform,
 } from "motion/react";
 import type { RefObject } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type KineticTypeScrollAlign = "start" | "center" | "end";
 
@@ -189,11 +189,35 @@ export default function KineticTypeScroll({
 }: KineticTypeScrollProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsPaused(document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry) {
+        setIsPaused(!entry.isIntersecting || document.hidden);
+      }
+    }, { rootMargin: "80px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     container,
     offset,
     target: wrapperRef,
   });
+
+  const disableMotion = Boolean(shouldReduceMotion || isPaused);
 
   return (
     <div
@@ -201,7 +225,7 @@ export default function KineticTypeScroll({
         // Gaps are in `em` and sized to clear the peak scale: `scale` is a
         // transform, so a magnified word overflows its layout box and a fixed
         // 8px gutter lets the crest collide with its neighbours.
-        "flex flex-wrap gap-x-[0.4em] gap-y-[0.18em]",
+        "flex flex-wrap gap-x-[0.4em] gap-y-[0.18em] max-w-full overflow-hidden",
         ALIGN_ROW_CLASS[align],
         className
       )}
@@ -219,7 +243,7 @@ export default function KineticTypeScroll({
           liftRange={liftRange}
           progress={scrollYProgress}
           scaleRange={scaleRange}
-          shouldReduceMotion={!!shouldReduceMotion}
+          shouldReduceMotion={disableMotion}
           stagger={stagger}
           total={words.length}
           trackingRange={trackingRange}

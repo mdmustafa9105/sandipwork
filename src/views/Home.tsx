@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import PagePreloader from "@/components/smoothui/page-preloader";
 import ThemeToggle from "@/components/smoothui/theme-toggle";
-import SiriOrb from "@/components/smoothui/siri-orb";
 import AIOrbFace from "@/components/smoothui/ai-orb-face";
-import KineticTypeScroll from "@/components/smoothui/kinetic-type-scroll";
 import AIConversation from "@/components/smoothui/ai-conversation";
 import AIMessage from "@/components/smoothui/ai-message";
 import AIReasoning from "@/components/smoothui/ai-reasoning";
@@ -13,7 +12,7 @@ import AIToolCall from "@/components/smoothui/ai-tool-call";
 import AITaskList from "@/components/smoothui/ai-task-list";
 import GridLoader from "@/components/smoothui/grid-loader";
 import TiltCard from "@/components/smoothui/tilt-card";
-import CoverflowCarousel, { type CoverflowCarouselItem } from "@/components/smoothui/coverflow-carousel";
+import type { CoverflowCarouselItem } from "@/components/smoothui/coverflow-carousel";
 import { SITE_CONTENT } from "@/content/site";
 import {
   Menu,
@@ -23,6 +22,57 @@ import {
   ChevronRight,
   Check,
 } from "lucide-react";
+
+// Lazy-load below-the-fold heavy components with ssr: false and matched-height placeholders
+const DynamicSiriOrb = dynamic(() => import("@/components/smoothui/siri-orb"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-hidden="true"
+      className="w-[180px] h-[180px] rounded-full bg-[#f5f5f7] border border-[#d6d6d6]"
+    />
+  ),
+});
+
+const DynamicAIOrbFace = dynamic(() => import("@/components/smoothui/ai-orb-face"), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-hidden="true"
+      className="w-[180px] h-[180px] rounded-full bg-[#f5f5f7] border border-[#d6d6d6]"
+    />
+  ),
+});
+
+const DynamicCoverflowCarousel = dynamic(
+  () => import("@/components/smoothui/coverflow-carousel"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="w-full h-[320px] rounded-2xl bg-[#f5f5f7] border border-[#e6e6e8] flex items-center justify-center text-[#707070] text-sm"
+      >
+        Loading stories...
+      </div>
+    ),
+  }
+);
+
+const DynamicKineticTypeScroll = dynamic(
+  () => import("@/components/smoothui/kinetic-type-scroll"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="min-h-[44px] flex items-center justify-center text-center apple-feature-heading text-[#1d1d1f] opacity-60"
+      >
+        {SITE_CONTENT.kineticBand.join(" ")}
+      </div>
+    ),
+  }
+);
 
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
@@ -42,15 +92,17 @@ export default function Home() {
     }
 
     const updateOrbSize = () => {
-      if (window.innerWidth >= 768) {
+      const w = window.innerWidth;
+      if (w >= 768) {
         setNavOpen(false);
       }
-      if (window.innerWidth >= 1024) {
+      if (w >= 1024) {
         setOrbSize(280);
-      } else if (window.innerWidth >= 640) {
+      } else if (w >= 640) {
         setOrbSize(230);
       } else {
-        setOrbSize(180);
+        // Never larger than the column width on mobile
+        setOrbSize(Math.max(140, Math.min(180, w - 48)));
       }
     };
     updateOrbSize();
@@ -127,13 +179,13 @@ export default function Home() {
   }));
 
   return (
-    <div className="relative min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3]/20">
-      {/* ── Page Preloader: White background, Ink text, word-by-word transition under 2s ── */}
+    <div className="relative min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3]/20 overflow-x-clip max-w-full">
+      {/* ── Page Preloader: White background, Ink text, under 1.5s on mobile ── */}
       {showPreloader && (
         <PagePreloader
           variant="words"
           words={["Qualify.", "Convert.", "Close."]}
-          duration={1600}
+          duration={1200}
           background="bg-white"
           onComplete={() => setShowPreloader(false)}
         />
@@ -252,7 +304,7 @@ export default function Home() {
             ═════════════════════════════════════════════════════════════════════════ */}
         <section
           id="hero"
-          className="relative bg-white pt-6 pb-12 md:py-0 md:min-h-[calc(100svh-44px)] md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
+          className="relative bg-white pt-6 pb-12 md:py-0 md:min-h-[calc(100svh-44px)] md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 overflow-hidden [contain:paint]"
         >
           {/* Subtle line grid behind hero: 1px in #d6d6d6, 64px cells, radial fade centered on character */}
           <div className="hero-grid-lines" aria-hidden="true" />
@@ -294,8 +346,11 @@ export default function Home() {
             </div>
 
             {/* RIGHT COLUMN: AI Character (ai-orb-face) large, centered, gaze-tracking */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center w-full">
-              <div className="flex items-center justify-center p-2">
+            <div className="md:col-span-5 flex flex-col items-center justify-center w-full max-w-full overflow-hidden">
+              <div
+                className="flex items-center justify-center p-2 max-w-full overflow-hidden"
+                style={{ width: orbSize, height: orbSize }}
+              >
                 <AIOrbFace
                   size={orbSize}
                   state="idle"
@@ -336,7 +391,7 @@ export default function Home() {
             </div>
 
             {/* Highlights Card Stage (Large 28px white card, NO shadow) */}
-            <div className="apple-card bg-white border border-[#e6e6e8] min-h-[520px] flex flex-col justify-between overflow-hidden">
+            <div className="apple-card bg-white border border-[#e6e6e8] min-h-[520px] flex flex-col justify-between overflow-hidden max-w-full [touch-action:pan-y]">
               {/* Card Title & Content */}
               <div className="mb-6">
                 <span className="text-[14px] font-semibold uppercase tracking-wider text-[#707070]">
@@ -391,19 +446,19 @@ export default function Home() {
                 )}
 
                 {activeHighlightIndex === 2 && (
-                  <div className="w-full max-w-xl bg-white rounded-2xl p-5 border border-[#d6d6d6]">
+                  <div className="w-full max-w-xl bg-white rounded-2xl p-5 border border-[#d6d6d6] overflow-hidden">
                     <AIToolCall
                       name="crm_lookup_and_calendar_schedule"
                       summary="2 operations executed · 180ms"
                       status="success"
                       defaultOpen={true}
                       args={
-                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#1d1d1f]">
+                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#1d1d1f] max-w-full overflow-x-auto whitespace-pre-wrap break-all">
                           {`{ "lead": "team@acmecorp.com", "seats": 60, "targetSlot": "Thursday 14:00 EST" }`}
                         </pre>
                       }
                       result={
-                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#0066cc]">
+                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#0066cc] max-w-full overflow-x-auto whitespace-pre-wrap break-all">
                           {`{ "meetingConfirmed": true, "salesforceOpportunity": "$72,000 ARR" }`}
                         </pre>
                       }
@@ -490,7 +545,9 @@ export default function Home() {
                   glare={false}
                   className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
                 >
-                  <SiriOrb size="180px" state="idle" />
+                  <div className="w-[180px] h-[180px] flex items-center justify-center">
+                    <DynamicSiriOrb size="180px" state="idle" />
+                  </div>
                   <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
                     {SITE_CONTENT.editorialSections[0].statsBadge}
                   </span>
@@ -499,8 +556,8 @@ export default function Home() {
             </div>
 
             {/* Kinetic Type Scroll: Single statement band between sections (Ink on White) */}
-            <div className="py-12 border-y border-[#d6d6d6] text-center">
-              <KineticTypeScroll
+            <div className="py-12 border-y border-[#d6d6d6] text-center max-w-full overflow-hidden">
+              <DynamicKineticTypeScroll
                 words={SITE_CONTENT.kineticBand}
                 align="center"
                 className="apple-feature-heading text-[#1d1d1f]"
@@ -515,16 +572,18 @@ export default function Home() {
                   glare={false}
                   className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
                 >
-                  <AIOrbFace
-                    size={180}
-                    state="streaming"
-                    gaze={true}
-                    colors={{
-                      body: "oklch(75% 0.16 230)",
-                      bodyEdge: "oklch(96% 0.02 230)",
-                      feature: "#1d1d1f",
-                    }}
-                  />
+                  <div className="w-[180px] h-[180px] flex items-center justify-center">
+                    <DynamicAIOrbFace
+                      size={180}
+                      state="streaming"
+                      gaze={false}
+                      colors={{
+                        body: "oklch(75% 0.16 230)",
+                        bodyEdge: "oklch(96% 0.02 230)",
+                        feature: "#1d1d1f",
+                      }}
+                    />
+                  </div>
                   <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
                     {SITE_CONTENT.editorialSections[1].statsBadge}
                   </span>
@@ -570,7 +629,9 @@ export default function Home() {
                   glare={false}
                   className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
                 >
-                  <SiriOrb size="180px" state="done" />
+                  <div className="w-[180px] h-[180px] flex items-center justify-center">
+                    <DynamicSiriOrb size="180px" state="done" />
+                  </div>
                   <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
                     {SITE_CONTENT.editorialSections[2].statsBadge}
                   </span>
@@ -593,15 +654,17 @@ export default function Home() {
               Browse real-world qualification metrics from revenue teams scaling pipeline volume.
             </p>
 
-            <CoverflowCarousel
-              items={carouselItems}
-              depth={120}
-              rotation={28}
-              spacing={250}
-              autoplay={true}
-              loop={true}
-              className="py-4"
-            />
+            <div className="w-full max-w-full overflow-hidden [touch-action:pan-y]">
+              <DynamicCoverflowCarousel
+                items={carouselItems}
+                depth={120}
+                rotation={28}
+                spacing={250}
+                autoplay={true}
+                loop={true}
+                className="py-4"
+              />
+            </div>
           </div>
         </section>
 
@@ -698,8 +761,10 @@ export default function Home() {
             </a>
 
             {/* Siri Orb centerpiece below the button */}
-            <div className="pt-4">
-              <SiriOrb size="160px" state="idle" />
+            <div className="pt-4 flex items-center justify-center">
+              <div className="w-[160px] h-[160px] flex items-center justify-center">
+                <DynamicSiriOrb size="160px" state="idle" />
+              </div>
             </div>
           </div>
         </section>
