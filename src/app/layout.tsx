@@ -1,15 +1,18 @@
 import type { Metadata } from 'next'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
 export const metadata: Metadata = {
-  title: 'Apple',
-  description: 'Discover the innovative world of Apple and shop everything iPhone, iPad, Apple Watch, Mac, and Apple TV. Explore accessories, entertainment, and device support.',
+  title: 'SandipAI — The Autonomous AI Sales Agent',
+  description: 'SandipAI is an autonomous AI sales agent that qualifies inbound leads, resolves technical objections, and books high-value meetings 24/7.',
   icons: {
     icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
   },
 }
 
@@ -19,13 +22,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>
-        <div className="app">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-white text-[#1d1d1f] antialiased selection:bg-[#0071e3]/20">
+        {children}
       </body>
     </html>
   )

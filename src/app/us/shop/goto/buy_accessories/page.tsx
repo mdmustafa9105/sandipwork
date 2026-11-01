@@ -1,4 +1,4 @@
-import Accessories from '@/src/views/Accessories'
+import Accessories from '@/views/Accessories'
 
 export default function BuyAccessoriesPage() {
   return <Accessories />

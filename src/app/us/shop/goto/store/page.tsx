@@ -1,4 +1,4 @@
-import Store from '@/src/views/Store'
+import Store from '@/views/Store'
 
 export default function StoreShopPage() {
   return <Store />
