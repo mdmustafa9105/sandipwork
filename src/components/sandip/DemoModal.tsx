@@ -72,7 +72,7 @@ function DemoModalContent({
 
       <motion.div
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative z-10 w-full max-w-[480px] overflow-hidden rounded-[14px] border border-[var(--dividers)] bg-[var(--surface)] text-left text-[var(--ink)]"
+        className="relative z-10 max-h-[calc(100svh-32px)] w-full max-w-[480px] overflow-y-auto rounded-[14px] border border-[var(--dividers)] bg-[var(--surface)] text-left text-[var(--ink)]"
         exit={
           shouldReduceMotion
             ? { opacity: 0 }
@@ -121,7 +121,7 @@ function DemoModalContent({
                 </div>
                 <dl className="grid grid-cols-2 gap-3 text-[13px]">
                   <div>
-                    <dt className="font-mono text-[10px] uppercase text-[var(--outlines)]">
+                    <dt className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">
                       Attendee
                     </dt>
                     <dd className="mt-0.5 font-medium text-[var(--ink)]">
@@ -129,7 +129,7 @@ function DemoModalContent({
                     </dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[10px] uppercase text-[var(--outlines)]">
+                    <dt className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">
                       Selected Tier
                     </dt>
                     <dd className="mt-0.5 font-semibold text-[var(--link)]">
@@ -137,7 +137,7 @@ function DemoModalContent({
                     </dd>
                   </div>
                   <div className="col-span-2 border-t border-[var(--hairline)] pt-2.5">
-                    <dt className="font-mono text-[10px] uppercase text-[var(--outlines)]">
+                    <dt className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">
                       Work Email
                     </dt>
                     <dd className="mt-0.5 font-mono text-[12.5px] text-[var(--ink)]">

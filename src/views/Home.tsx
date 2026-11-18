@@ -239,8 +239,8 @@ export default function Home() {
             id: story.id,
             content: (
               <article className="grid h-full w-full grid-cols-1 border border-[var(--dividers)] bg-[var(--surface)] text-left sm:grid-cols-12">
-                <div className="flex flex-row items-baseline justify-between border-b border-[var(--hairline)] bg-[var(--surface-subtle)] p-5 sm:col-span-4 sm:flex-col sm:border-r sm:border-b-0 sm:p-6">
-                  <span className="font-mono text-[10.5px] font-semibold tracking-[0.1em] text-[var(--outlines)]">
+                <div className="flex flex-row items-baseline justify-between border-b border-[var(--hairline)] bg-[var(--surface-subtle)] px-5 py-3.5 sm:col-span-4 sm:flex-col sm:border-r sm:border-b-0 sm:p-6">
+                  <span className="font-mono text-[10.5px] font-semibold tracking-[0.1em] text-[var(--text-secondary)]">
                     CASE {indexLabel} / 04
                   </span>
                   <div className="text-right sm:mt-auto sm:text-left">
@@ -291,7 +291,7 @@ export default function Home() {
                       {story.role} · {story.company}
                     </p>
                   </div>
-                  <span className="font-mono text-[10.5px] tracking-[0.1em] text-[#6e6e73]">
+                  <span className="font-mono text-[10.5px] tracking-[0.1em] text-[#a1a1a6]">
                     {indexLabel} / 04
                   </span>
                 </header>
@@ -362,7 +362,7 @@ export default function Home() {
           content: (
             <article className="flex h-full w-full border border-[var(--dividers)] bg-[var(--surface)] text-left">
               <div className="flex w-12 shrink-0 flex-col items-center justify-between border-r border-[var(--hairline)] bg-[var(--surface-subtle)] py-6">
-                <span className="font-mono text-[11px] font-semibold text-[var(--outlines)]">
+                <span className="font-mono text-[11px] font-semibold text-[var(--text-secondary)]">
                   {indexLabel}
                 </span>
                 <span className="h-10 w-px bg-[var(--dividers)]" />
@@ -806,7 +806,7 @@ export default function Home() {
                   {/* ── TIER 01: GROWTH — Compact, Precise Paper Entry Sheet ── */}
                   <div className="flex flex-col justify-between rounded-[12px] border border-[var(--dividers)] bg-[var(--surface)] p-6 transition-colors hover:border-[var(--outlines)] lg:col-span-4 lg:my-3 lg:p-7">
                     <div>
-                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--outlines)]">
+                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
                         <span>TIER 01</span>
                         <span>SCALING TEAMS</span>
                       </div>
@@ -936,7 +936,7 @@ export default function Home() {
                           {enterprise.price}
                         </span>
                         <span className="font-mono text-[10.5px] uppercase tracking-[0.07em] text-[var(--link)]">
-                          ANNUAL CONTRACT
+                          TAILORED SLA
                         </span>
                       </div>
 
@@ -946,7 +946,7 @@ export default function Home() {
                             className="flex items-start gap-2.5 text-[13.5px] leading-[1.45] text-[var(--ink)]"
                             key={feature}
                           >
-                            <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold text-[var(--outlines)]">
+                            <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold text-[var(--text-secondary)]">
                               {String(fIdx + 1).padStart(2, "0")}
                             </span>
                             <span>{feature}</span>

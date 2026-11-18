@@ -30,19 +30,19 @@ const REASONING_TRACE = [
     op: "OP-01",
     scope: "FIRM_SCORE",
     text: "Analyzing prospect inquiry: Company sizing (60 seats) indicates Enterprise tier.",
-    latency: "18ms",
+    duration: "0.3s",
   },
   {
     op: "OP-02",
     scope: "POLICY_CHK",
     text: "Checking compliance requirement: SOC 2 Type II whitepaper verified in knowledge base.",
-    latency: "42ms",
+    duration: "0.4s",
   },
   {
     op: "OP-03",
     scope: "CAL_QUERY",
     text: "Calling Google Calendar API: Found open slot on Thursday at 2:00 PM EST.",
-    latency: "120ms",
+    duration: "0.5s",
   },
 ] as const;
 
@@ -186,12 +186,12 @@ export default function ProductHighlightsStage() {
                 type="button"
               >
                 <div className="flex w-full items-center justify-between gap-2">
-                  <span className="font-mono text-[10px] font-semibold tracking-[0.08em] text-[var(--outlines)]">
+                  <span className="font-mono text-[10px] font-semibold tracking-[0.08em] text-[var(--text-secondary)]">
                     {stage.code}
                   </span>
                   <span
-                    className={`font-mono text-[9px] tracking-[0.08em] ${
-                      isActive ? "text-[var(--link)]" : "text-[var(--outlines)]"
+                    className={`font-mono text-[9.5px] tracking-[0.08em] ${
+                      isActive ? "text-[var(--link)]" : "text-[var(--text-secondary)]"
                     }`}
                   >
                     {stage.artifact}
@@ -280,30 +280,30 @@ export default function ProductHighlightsStage() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Architectural Thread Metadata Strip (no inner rounded box) */}
+          {/* Architectural Thread Metadata Strip (clearly labeled illustrative walkthrough) */}
           <div className="mt-8 border-t border-[var(--dividers)] pt-5">
             <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-              <span>THREAD #ACME-204</span>
-              <span className="inline-flex items-center gap-1.5 text-[var(--success)]">
-                <span className="size-1.5 rounded-full bg-[var(--success)]" />
-                ACTIVE SESSION
+              <span>SAMPLE THREAD #ACME-204</span>
+              <span className="inline-flex items-center gap-1.5 text-[var(--link)]">
+                <span className="size-1.5 rounded-full bg-[var(--pill-blue)]" />
+                ILLUSTRATIVE DEMO
               </span>
             </div>
             <div className="grid grid-cols-3 divide-x divide-[var(--hairline)]">
               <div className="pr-3">
-                <p className="font-mono text-[10px] uppercase text-[var(--outlines)]">Account</p>
+                <p className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">Account</p>
                 <p className="mt-0.5 truncate text-[13px] font-semibold text-[var(--ink)]">
                   Acme Corp
                 </p>
               </div>
               <div className="px-3">
-                <p className="font-mono text-[10px] uppercase text-[var(--outlines)]">Scope</p>
+                <p className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">Scope</p>
                 <p className="mt-0.5 text-[13px] font-semibold tabular-nums text-[var(--ink)]">
                   60 seats
                 </p>
               </div>
               <div className="pl-3">
-                <p className="font-mono text-[10px] uppercase text-[var(--outlines)]">Pipeline</p>
+                <p className="font-mono text-[10px] uppercase text-[var(--text-secondary)]">Pipeline</p>
                 <p className="mt-0.5 text-[13px] font-semibold tabular-nums text-[var(--ink)]">
                   $72k ARR
                 </p>
@@ -329,7 +329,7 @@ export default function ProductHighlightsStage() {
                 <div className="flex items-center justify-between border-b border-[var(--hairline)] px-4 py-2.5 sm:px-5">
                   <div className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                     <span className="size-1.5 rounded-full bg-[var(--success)]" />
-                    <span>LIVE TRANSCRIPT · INBOUND WEB</span>
+                    <span>SAMPLE TRANSCRIPT · INBOUND WEB</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[10.5px] text-[var(--link)]">
@@ -352,7 +352,7 @@ export default function ProductHighlightsStage() {
                         <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
                           Prospect
                         </p>
-                        <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[var(--outlines)]">
+                        <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[var(--text-secondary)]">
                           10:14:02 EST
                         </p>
                       </div>
@@ -369,7 +369,7 @@ export default function ProductHighlightsStage() {
                         <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[var(--link)]">
                           SandipAI
                         </p>
-                        <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[var(--outlines)]">
+                        <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[var(--text-secondary)]">
                           10:14:03 EST
                         </p>
                       </div>
@@ -425,13 +425,13 @@ export default function ProductHighlightsStage() {
                 {/* Technical Trace Header */}
                 <div className="flex items-center justify-between border-b border-[#26262a] px-4 py-3 sm:px-5">
                   <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.09em] text-[#98989d]">
-                      TRACE // REASONING ENGINE
+                    <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.09em] text-[#a1a1a6]">
+                      SAMPLE TRACE // REASONING ENGINE
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-[11px] tabular-nums text-[#2997ff]">
-                      180ms total
+                      1.2s total
                     </span>
                     <GridLoader
                       color="#2997ff"
@@ -445,7 +445,7 @@ export default function ProductHighlightsStage() {
                 {/* Inspectable Reasoning Collapsible */}
                 <div className="p-4 sm:p-5">
                   <AIReasoning
-                    className="[&_button]:text-[#98989d] [&_button:hover]:text-[#f5f5f7]"
+                    className="[&_button]:text-[#a1a1a6] [&_button:hover]:text-[#f5f5f7]"
                     collapseWhenDone={false}
                     defaultOpen={true}
                     duration={1.2}
@@ -460,26 +460,31 @@ export default function ProductHighlightsStage() {
                               opacity: revealed ? 1 : 0.22,
                               x: revealed ? 0 : -4,
                             }}
-                            className="grid grid-cols-12 items-start gap-2 py-3 first:pt-1 last:pb-1"
+                            className="flex flex-col gap-1.5 py-3 first:pt-1 last:pb-1 sm:grid sm:grid-cols-12 sm:items-start sm:gap-2"
                             key={row.op}
                             transition={{
                               duration: shouldReduceMotion ? 0 : 0.25,
                               ease: [0.22, 1, 0.36, 1],
                             }}
                           >
-                            <div className="col-span-3 flex flex-col sm:col-span-2">
-                              <span className="font-mono text-[10.5px] font-semibold text-[#2997ff]">
-                                {row.op}
-                              </span>
-                              <span className="font-mono text-[9px] text-[#6e6e73]">
-                                {row.scope}
+                            <div className="flex items-center justify-between gap-2 sm:col-span-3 sm:flex-col sm:items-start sm:gap-0">
+                              <div className="flex items-center gap-2 sm:flex-col sm:items-start sm:gap-0">
+                                <span className="font-mono text-[10.5px] font-semibold text-[#2997ff]">
+                                  {row.op}
+                                </span>
+                                <span className="font-mono text-[9.5px] text-[#a1a1a6]">
+                                  {row.scope}
+                                </span>
+                              </div>
+                              <span className="font-mono text-[11px] tabular-nums text-[#30d158] sm:hidden">
+                                {row.duration}
                               </span>
                             </div>
-                            <p className="col-span-7 text-[13px] leading-[1.5] text-[#e5e5ea] sm:col-span-8">
+                            <p className="text-[13px] leading-[1.5] text-[#e5e5ea] sm:col-span-7">
                               {row.text}
                             </p>
-                            <span className="col-span-2 text-right font-mono text-[11px] tabular-nums text-[#30d158]">
-                              {row.latency}
+                            <span className="hidden text-right font-mono text-[11px] tabular-nums text-[#30d158] sm:col-span-2 sm:inline">
+                              {row.duration}
                             </span>
                           </motion.div>
                         );
@@ -489,8 +494,8 @@ export default function ProductHighlightsStage() {
                 </div>
 
                 {/* Trace Verdict Strip */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#26262a] bg-[#1a1a1d] px-4 py-2.5 font-mono text-[10.5px] text-[#98989d] sm:px-5">
-                  <span>VERDICT: POLICY VERIFIED · NO HALLUCINATION FLAGS</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#26262a] bg-[#1a1a1d] px-4 py-2.5 font-mono text-[10.5px] text-[#a1a1a6] sm:px-5">
+                  <span>VERDICT: POLICY VERIFIED · EXAMPLE TRACE</span>
                   <span className="text-[#30d158]">ACTION → BOOK_SE_SLOT</span>
                 </div>
               </motion.div>
@@ -543,7 +548,7 @@ export default function ProductHighlightsStage() {
                   <div className="flex flex-col justify-between p-5 sm:col-span-7">
                     <div className="space-y-3">
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--outlines)]">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                           PROSPECT ATTENDEE
                         </p>
                         <p className="mt-0.5 text-[14px] font-semibold text-[var(--ink)]">
@@ -555,7 +560,7 @@ export default function ProductHighlightsStage() {
                       </div>
                       <div className="grid grid-cols-2 gap-3 border-t border-[var(--hairline)] pt-3">
                         <div>
-                          <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--outlines)]">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                             ASSIGNED HOST
                           </p>
                           <p className="mt-0.5 text-[12.5px] font-medium text-[var(--ink)]">
@@ -563,7 +568,7 @@ export default function ProductHighlightsStage() {
                           </p>
                         </div>
                         <div>
-                          <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--outlines)]">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                             SALESFORCE OPP
                           </p>
                           <p className="mt-0.5 font-mono text-[12.5px] font-semibold tabular-nums text-[var(--link)]">
@@ -621,19 +626,19 @@ export default function ProductHighlightsStage() {
                   </span>
                 </div>
 
-                {/* Indexed Table Rows */}
+                {/* Indexed Table Rows (responsive without mobile code/label collision) */}
                 <ol className="divide-y divide-[var(--hairline)]">
                   {LEDGER_STEPS.map((row, idx) => {
                     const isDone = idx < completedTasks;
                     const isRunning = idx === completedTasks;
                     return (
                       <li
-                        className={`relative grid grid-cols-12 items-center gap-2 px-4 py-3 transition-colors sm:px-5 ${
+                        className={`relative grid grid-cols-12 items-start gap-2 px-4 py-3 transition-colors sm:items-center sm:px-5 ${
                           isRunning ? "bg-[var(--pill-blue-soft)]" : ""
                         }`}
                         key={row.idx}
                       >
-                        <div className="col-span-2 flex items-center gap-2">
+                        <div className="col-span-2 flex items-center gap-2 pt-0.5 sm:col-span-3 sm:pt-0">
                           <span
                             className={`flex size-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] transition-colors ${
                               isDone
@@ -645,24 +650,27 @@ export default function ProductHighlightsStage() {
                           >
                             {isDone && <Check className="size-2.5 stroke-[2.5]" />}
                           </span>
-                          <span className="font-mono text-[10px] font-semibold text-[var(--outlines)]">
+                          <span className="font-mono text-[10px] font-semibold text-[var(--text-secondary)] sm:hidden">
+                            {row.idx}
+                          </span>
+                          <span className="hidden font-mono text-[10px] font-semibold text-[var(--text-secondary)] sm:inline">
                             {row.code}
                           </span>
                         </div>
 
-                        <div className="col-span-7 min-w-0">
+                        <div className="col-span-7 min-w-0 sm:col-span-6">
                           <p
-                            className={`truncate text-[13px] font-medium transition-opacity ${
+                            className={`text-[13px] font-medium leading-snug transition-opacity ${
                               isDone
                                 ? "text-[var(--ink)]"
                                 : isRunning
                                   ? "font-semibold text-[var(--ink)]"
-                                  : "text-[var(--text-secondary)] opacity-60"
+                                  : "text-[var(--text-secondary)] opacity-70"
                             }`}
                           >
                             {row.label}
                           </p>
-                          <p className="font-mono text-[10px] text-[var(--outlines)]">
+                          <p className="mt-0.5 font-mono text-[10px] text-[var(--text-secondary)]">
                             {row.owner}
                           </p>
                         </div>
@@ -674,7 +682,7 @@ export default function ProductHighlightsStage() {
                                 ? "text-[var(--ink)]"
                                 : isRunning
                                   ? "text-[var(--link)]"
-                                  : "text-[var(--outlines)]"
+                                  : "text-[var(--text-secondary)]"
                             }`}
                           >
                             {isDone ? row.note : isRunning ? "Running…" : "Queued"}

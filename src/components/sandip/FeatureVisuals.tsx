@@ -74,9 +74,9 @@ export function ConversationalIntelligenceVisual({
   return (
     <div className="w-full overflow-hidden rounded-[12px] border border-[var(--dividers)] bg-[var(--surface)]">
       {/* Top Dossier Index Strip */}
-      <div className="flex items-center justify-between border-b border-[var(--dividers)] bg-[var(--alt-band)] px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--dividers)] bg-[var(--alt-band)] px-5 py-3">
         <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.09em] text-[var(--text-secondary)]">
-          OBJECTION INTELLIGENCE // LIVE BRIEF
+          OBJECTION INTELLIGENCE // INTERACTIVE EXAMPLE
         </span>
         {statsBadge && (
           <span className="font-mono text-[11px] font-semibold text-[var(--link)]">
@@ -126,7 +126,7 @@ export function ConversationalIntelligenceVisual({
                     className="absolute inset-x-0 bottom-0 h-[2px] bg-[var(--pill-blue)] sm:hidden"
                   />
                 )}
-                <span className="font-mono text-[10px] font-semibold tracking-[0.08em] text-[var(--outlines)]">
+                <span className="font-mono text-[10px] font-semibold tracking-[0.08em] text-[var(--text-secondary)]">
                   CASE {item.index}
                 </span>
                 <span className="mt-1 text-[13px] font-semibold">{item.label}</span>
@@ -161,7 +161,7 @@ export function ConversationalIntelligenceVisual({
             >
               {/* Prospect Objection Block */}
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--outlines)]">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)]">
                   PROSPECT OBJECTION
                 </p>
                 <p className="mt-1.5 text-[15px] font-medium leading-[1.5] text-[var(--ink)]">
@@ -180,9 +180,9 @@ export function ConversationalIntelligenceVisual({
               </div>
 
               {/* Structured Classification Ledger Footer */}
-              <div className="grid grid-cols-3 gap-3 border-t border-[var(--hairline)] pt-4">
+              <div className="grid grid-cols-1 gap-3 border-t border-[var(--hairline)] pt-4 sm:grid-cols-3">
                 <div>
-                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--outlines)]">
+                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
                     INTENT
                   </p>
                   <p className="mt-0.5 text-[12px] font-semibold text-[var(--ink)]">
@@ -190,7 +190,7 @@ export function ConversationalIntelligenceVisual({
                   </p>
                 </div>
                 <div>
-                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--outlines)]">
+                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
                     STATUS
                   </p>
                   <p className="mt-0.5 text-[12px] font-semibold text-[var(--success)]">
@@ -198,7 +198,7 @@ export function ConversationalIntelligenceVisual({
                   </p>
                 </div>
                 <div>
-                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--outlines)]">
+                  <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
                     ACTION
                   </p>
                   <p className="mt-0.5 text-[12px] font-semibold text-[var(--ink)]">
@@ -316,13 +316,13 @@ export function PipelineVelocityVisual({
       {/* Upper Chronological Run-Sheet (sharp editorial top-left, asymmetrical structure) */}
       <div className="overflow-hidden rounded-[12px] border border-[var(--dividers)] bg-[var(--alt-band)]">
         {/* Oversized Chronometer Header */}
-        <div className="flex items-end justify-between border-b border-[var(--dividers)] bg-[var(--surface)] px-5 py-4 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[var(--dividers)] bg-[var(--surface)] px-5 py-4 sm:px-6">
           <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--outlines)]">
-              INQUIRY-TO-BOOKING CHRONOMETER
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--text-secondary)]">
+              ILLUSTRATIVE INQUIRY-TO-BOOKING FLOW
             </p>
-            <div className="mt-1 flex items-baseline gap-2.5">
-              <span className="font-mono text-[42px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--ink)]">
+            <div className="mt-1 flex flex-wrap items-baseline gap-2.5">
+              <span className="font-mono text-[40px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--ink)] sm:text-[42px]">
                 00:{String(elapsed).padStart(2, "0")}
               </span>
               <span className="font-mono text-[11px] font-semibold uppercase text-[var(--link)]">
@@ -353,13 +353,13 @@ export function PipelineVelocityVisual({
               className="pv-step grid grid-cols-12 items-center gap-2 py-3.5"
               key={step.time}
             >
-              <span className="col-span-2 font-mono text-[12px] font-semibold tabular-nums text-[var(--ink)]">
+              <span className="col-span-3 font-mono text-[12px] font-semibold tabular-nums text-[var(--ink)] sm:col-span-2">
                 {step.time}
               </span>
-              <span className="col-span-2 hidden font-mono text-[9.5px] font-semibold tracking-[0.08em] text-[var(--outlines)] sm:inline">
+              <span className="col-span-2 hidden font-mono text-[9.5px] font-semibold tracking-[0.08em] text-[var(--text-secondary)] sm:inline">
                 {step.phase}
               </span>
-              <div className="col-span-9 min-w-0 sm:col-span-7">
+              <div className="col-span-8 min-w-0 sm:col-span-7">
                 <p className="text-[13.5px] font-semibold text-[var(--ink)]">
                   {step.title}
                 </p>
@@ -385,27 +385,27 @@ export function PipelineVelocityVisual({
 
       {/* Lower Detached Booking Confirmation Slip (intentional tonal contrast) */}
       <div className="overflow-hidden rounded-[12px] border border-[#2c2c30] bg-[#141416] p-4 text-[#f5f5f7] sm:px-6 sm:py-4">
-        <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.09em]">
-          <span className="text-[#98989d]">FINAL BOOKING STATE · SOLUTIONS ENGINEER</span>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.09em]">
+          <span className="text-[#a1a1a6]">SAMPLE BOOKING · SOLUTIONS ENGINEER</span>
           <span className="text-[#30d158]">
             {booked ? "INVITE DISPATCHED" : "RESERVING SLOT…"}
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {WEEK_DAYS.map((d) => {
             const isConfirmed = d.active && booked;
             return (
               <div
-                className={`rounded-[8px] border px-2.5 py-2 text-left transition-colors duration-300 ${
+                className={`rounded-[8px] border px-3 py-2 text-left transition-colors duration-300 ${
                   isConfirmed
                     ? "border-[#0071e3] bg-[#0071e3] text-white"
-                    : "border-[#26262a] bg-[#1c1c20] text-[#98989d]"
+                    : "border-[#26262a] bg-[#1c1c20] text-[#a1a1a6]"
                 }`}
                 key={d.day}
               >
                 <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-[9.5px] tracking-[0.06em] opacity-80">
+                  <span className="font-mono text-[10px] tracking-[0.06em]">
                     {d.day}
                   </span>
                   <span className="font-mono text-[13px] font-semibold tabular-nums text-white">
@@ -413,8 +413,8 @@ export function PipelineVelocityVisual({
                   </span>
                 </div>
                 <p
-                  className={`mt-1 font-mono text-[10px] tabular-nums ${
-                    isConfirmed ? "font-semibold text-white" : "text-[#6e6e73]"
+                  className={`mt-1 font-mono text-[10.5px] tabular-nums ${
+                    isConfirmed ? "font-semibold text-white" : "text-[#a1a1a6]"
                   }`}
                 >
                   {d.active ? "14:00 EST" : "Open"}
@@ -441,7 +441,7 @@ const ECOSYSTEM_NODES = [
     name: "Salesforce",
     category: "CRM Opportunity",
     direction: "Bi-dir",
-    latency: "140ms",
+    syncMode: "Real-time",
     fields: [
       { label: "Opportunity", value: "Acme Corp · $72,000 ARR" },
       { label: "Qualification", value: "98/100 · Enterprise" },
@@ -454,7 +454,7 @@ const ECOSYSTEM_NODES = [
     name: "HubSpot",
     category: "Contact Lifecycle",
     direction: "Bi-dir",
-    latency: "120ms",
+    syncMode: "Real-time",
     fields: [
       { label: "Lifecycle Stage", value: "Sales Qualified Lead" },
       { label: "Lead Source", value: "Autonomous Web Agent" },
@@ -467,7 +467,7 @@ const ECOSYSTEM_NODES = [
     name: "Slack",
     category: "AE Instant Brief",
     direction: "Push",
-    latency: "95ms",
+    syncMode: "Instant",
     fields: [
       { label: "Channel", value: "#enterprise-inbound" },
       { label: "Summary", value: "60 seats · SOC 2 verified" },
@@ -480,7 +480,7 @@ const ECOSYSTEM_NODES = [
     name: "Google Workspace",
     category: "Calendar & Meet",
     direction: "Bi-dir",
-    latency: "180ms",
+    syncMode: "Real-time",
     fields: [
       { label: "Calendar Event", value: "Technical Walkthrough" },
       { label: "Meeting Link", value: "Google Meet generated" },
@@ -545,7 +545,7 @@ export function EcosystemSyncVisual({
               )}
 
               <div className="col-span-5 flex items-center gap-2.5 sm:col-span-4">
-                <span className="font-mono text-[10px] font-semibold tracking-[0.06em] text-[var(--outlines)]">
+                <span className="hidden font-mono text-[10px] font-semibold tracking-[0.06em] text-[var(--text-secondary)] sm:inline">
                   {node.code}
                 </span>
                 <span className="truncate text-[13.5px] font-semibold text-[var(--ink)]">
@@ -572,8 +572,8 @@ export function EcosystemSyncVisual({
               </span>
 
               <div className="col-span-3 flex items-center justify-end gap-2 sm:col-span-2">
-                <span className="font-mono text-[11px] font-medium tabular-nums text-[var(--success)]">
-                  {node.latency}
+                <span className="font-mono text-[10.5px] font-medium uppercase text-[var(--success)]">
+                  {node.syncMode}
                 </span>
               </div>
             </button>
@@ -583,11 +583,11 @@ export function EcosystemSyncVisual({
 
       {/* Bottom Live Synced Record Inspector (flush ledger band) */}
       <div className="border-t border-[var(--dividers)] bg-[var(--surface-subtle)] p-5">
-        <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.08em]">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.08em]">
           <span className="font-semibold text-[var(--ink)]">
-            SYNCED RECORD // {activeNode.name.toUpperCase()}
+            SAMPLE RECORD // {activeNode.name.toUpperCase()}
           </span>
-          <span className="text-[var(--success)]">VERIFIED · ZERO MANUAL INPUT</span>
+          <span className="text-[var(--success)]">AUTOMATED LOGGING</span>
         </div>
 
         <AnimatePresence mode="wait">
@@ -613,7 +613,7 @@ export function EcosystemSyncVisual({
                 }`}
                 key={field.label}
               >
-                <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--outlines)]">
+                <p className="font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
                   {field.label}
                 </p>
                 <p className="mt-1 text-[12.5px] font-semibold text-[var(--ink)]">
