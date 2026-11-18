@@ -1,7 +1,7 @@
 "use client";
 
-import SmoothButton from "@/components/smoothui/smooth-button";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -16,6 +16,7 @@ export interface CoverflowCarouselItem {
 export interface CoverflowCarouselProps {
   autoplay?: boolean;
   autoplayDelay?: number;
+  cardClassName?: string;
   className?: string;
   depth?: number;
   index?: number;
@@ -25,7 +26,9 @@ export interface CoverflowCarouselProps {
   onIndexChange?: (index: number) => void;
   rotation?: number;
   scaleStep?: number;
+  showIndicators?: boolean;
   spacing?: number;
+  stageClassName?: string;
 }
 
 interface DragInfo {
@@ -33,15 +36,15 @@ interface DragInfo {
   velocity: { x: number; y: number };
 }
 
-const DEFAULT_DEPTH = 180;
-const DEFAULT_ROTATION = 45;
-const DEFAULT_SPACING = 220;
-const DEFAULT_SCALE_STEP = 0.15;
-const DEFAULT_AUTOPLAY_DELAY = 4000;
-const SWIPE_VELOCITY_THRESHOLD = 500;
-const SWIPE_DISTANCE_THRESHOLD = 80;
-const MAX_VISIBLE_OFFSET = 3;
-const MIN_SCALE = 0.4;
+const DEFAULT_DEPTH = 140;
+const DEFAULT_ROTATION = 22;
+const DEFAULT_SPACING = 340;
+const DEFAULT_SCALE_STEP = 0.12;
+const DEFAULT_AUTOPLAY_DELAY = 5000;
+const SWIPE_VELOCITY_THRESHOLD = 450;
+const SWIPE_DISTANCE_THRESHOLD = 65;
+const MAX_VISIBLE_OFFSET = 2;
+const MIN_SCALE = 0.65;
 
 const CoverflowCarousel = ({
   items,
@@ -55,6 +58,9 @@ const CoverflowCarousel = ({
   loop = false,
   autoplay = false,
   autoplayDelay = DEFAULT_AUTOPLAY_DELAY,
+  showIndicators = true,
+  cardClassName,
+  stageClassName,
   className,
 }: CoverflowCarouselProps) => {
   const shouldReduceMotion = useReducedMotion();
@@ -62,7 +68,24 @@ const CoverflowCarousel = ({
   const isControlled = indexProp !== undefined;
   const activeIndex = isControlled ? indexProp : internalIndex;
   const [isPaused, setIsPaused] = useState(false);
+  const [responsiveSpacing, setResponsiveSpacing] = useState(spacing);
   const total = items.length;
+
+  useEffect(() => {
+    const updateSpacing = () => {
+      const w = window.innerWidth;
+      if (w < 640) {
+        setResponsiveSpacing(Math.min(spacing, Math.round(w * 0.84)));
+      } else if (w < 1024) {
+        setResponsiveSpacing(Math.min(spacing, 320));
+      } else {
+        setResponsiveSpacing(spacing);
+      }
+    };
+    updateSpacing();
+    window.addEventListener("resize", updateSpacing);
+    return () => window.removeEventListener("resize", updateSpacing);
+  }, [spacing]);
 
   const goTo = useCallback(
     (next: number) => {
@@ -113,9 +136,12 @@ const CoverflowCarousel = ({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry) setIsPaused(!entry.isIntersecting || document.hidden);
-    }, { threshold: 0.1 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) setIsPaused(!entry.isIntersecting || document.hidden);
+      },
+      { threshold: 0.1 }
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -148,14 +174,24 @@ const CoverflowCarousel = ({
     }
   };
 
-  const dragEndRef = useRef(handleDragEnd);
-  dragEndRef.current = handleDragEnd;
+  // Compute circular shortest signed offset when loop=true so side cards always balance symmetrically
+  const getOffset = (i: number) => {
+    let diff = i - activeIndex;
+    if (loop && total > 2) {
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+    }
+    return diff;
+  };
 
   return (
     <div
-      aria-label="Coverflow carousel"
+      aria-label="Customer stories carousel"
       aria-roledescription="carousel"
-      className={cn("relative w-full max-w-full overflow-hidden select-none outline-none", className)}
+      className={cn(
+        "relative w-full max-w-full overflow-hidden select-none outline-none",
+        className
+      )}
       onBlur={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
       onKeyDown={handleKeyDown}
@@ -163,21 +199,27 @@ const CoverflowCarousel = ({
       onMouseLeave={() => setIsPaused(false)}
       ref={containerRef}
       role="region"
-      style={{ perspective: shouldReduceMotion ? undefined : 1200, touchAction: "pan-y" }}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: this WAI-ARIA APG carousel widget intentionally accepts focus so ArrowLeft/ArrowRight can move slides while the region is focused (in addition to the Previous/Next buttons below); removing tabIndex would remove that keyboard-navigation path entirely.
+      style={{
+        perspective: shouldReduceMotion ? undefined : 1400,
+        touchAction: "pan-y",
+      }}
       tabIndex={0}
     >
       <motion.div
-        className="relative mx-auto flex h-[320px] max-w-full items-center justify-center overflow-hidden"
+        className={cn(
+          "relative mx-auto flex h-[340px] sm:h-[360px] max-w-full items-center justify-center overflow-hidden",
+          stageClassName
+        )}
         drag={total > 1 && !shouldReduceMotion ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.12}
-        onDragEnd={(event, info) => dragEndRef.current(event, info)}
+        onDragEnd={handleDragEnd}
         style={{ transformStyle: "preserve-3d", touchAction: "pan-y" }}
       >
         {items.map((item, i) => {
-          const offset = i - activeIndex;
-          const isVisible = Math.abs(offset) <= MAX_VISIBLE_OFFSET;
+          const offset = getOffset(i);
+          const absOffset = Math.abs(offset);
+          const isVisible = absOffset <= MAX_VISIBLE_OFFSET;
           const isActive = offset === 0;
 
           if (!isVisible) {
@@ -185,20 +227,19 @@ const CoverflowCarousel = ({
           }
 
           const direction = inverted ? -1 : 1;
-          const rotateY = shouldReduceMotion
-            ? 0
-            : direction * -offset * rotation;
-          const translateX = offset * spacing;
-          const translateZ = shouldReduceMotion ? 0 : -Math.abs(offset) * depth;
-          const scale = Math.max(1 - Math.abs(offset) * scaleStep, MIN_SCALE);
+          const rotateY = shouldReduceMotion ? 0 : direction * -offset * rotation;
+          const translateX = offset * responsiveSpacing;
+          const translateZ = shouldReduceMotion ? 0 : -absOffset * depth;
+          const scale = Math.max(1 - absOffset * scaleStep, MIN_SCALE);
+          const opacity = isActive ? 1 : Math.max(0.32, 1 - absOffset * 0.42);
 
           return (
             <motion.div
               animate={
                 shouldReduceMotion
-                  ? { opacity: isActive ? 1 : 0, x: translateX }
+                  ? { opacity: isActive ? 1 : 0, x: isActive ? 0 : translateX }
                   : {
-                      opacity: 1,
+                      opacity,
                       rotateY,
                       scale,
                       x: translateX,
@@ -206,16 +247,26 @@ const CoverflowCarousel = ({
                     }
               }
               aria-hidden={!isActive}
-              className="absolute h-[220px] w-[280px] max-w-[calc(100vw-48px)] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-none"
+              className={cn(
+                "absolute w-[calc(100vw-40px)] max-w-[480px] sm:w-[460px] md:w-[520px] h-[296px] sm:h-[308px] overflow-hidden rounded-[28px]",
+                !isActive && "cursor-pointer",
+                cardClassName
+              )}
               key={item.id}
+              onClick={() => {
+                if (!isActive) goTo(i);
+              }}
               style={{
                 transformStyle: "preserve-3d",
-                zIndex: total - Math.abs(offset),
+                zIndex: total - absOffset,
               }}
               transition={
                 shouldReduceMotion
                   ? { duration: 0 }
-                  : { bounce: 0.1, duration: 0.25, type: "spring" }
+                  : {
+                      duration: 0.48,
+                      ease: [0.22, 1, 0.36, 1],
+                    }
               }
             >
               {item.image ? (
@@ -226,7 +277,7 @@ const CoverflowCarousel = ({
                   src={item.image}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center p-4 text-sm">
+                <div className="flex h-full w-full items-stretch justify-center">
                   {item.content}
                 </div>
               )}
@@ -235,27 +286,53 @@ const CoverflowCarousel = ({
         })}
       </motion.div>
 
-      <div className="mt-4 flex items-center justify-center gap-4">
-        <SmoothButton
-          aria-label="Previous slide"
+      {/* Refined Apple-style navigation bar: Prev + Dots + Counter + Next */}
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button
+          aria-label="Previous customer story"
+          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--dividers)] bg-[var(--surface)] text-[var(--ink)] transition-colors hover:border-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35"
           disabled={!loop && activeIndex === 0}
           onClick={() => goTo(activeIndex - 1)}
-          shape="pill"
-          size="sm"
-          variant="outline"
+          type="button"
         >
-          Prev
-        </SmoothButton>
-        <SmoothButton
-          aria-label="Next slide"
+          <ChevronLeft className="size-4" />
+        </button>
+
+        {showIndicators && (
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--hairline)] bg-[var(--surface)] px-3.5 py-2">
+            {items.map((item, idx) => {
+              const selected = idx === activeIndex;
+              return (
+                <button
+                  aria-current={selected ? "true" : undefined}
+                  aria-label={`View story ${idx + 1} of ${total}`}
+                  className={cn(
+                    "h-2 cursor-pointer rounded-full transition-all duration-300",
+                    selected
+                      ? "w-7 bg-[var(--ink)]"
+                      : "w-2 bg-[var(--dividers)] hover:bg-[var(--outlines)]"
+                  )}
+                  key={item.id}
+                  onClick={() => goTo(idx)}
+                  type="button"
+                />
+              );
+            })}
+            <span className="ml-1.5 border-l border-[var(--hairline)] pl-2.5 text-[12px] font-medium tabular-nums text-[var(--text-secondary)]">
+              {activeIndex + 1} / {total}
+            </span>
+          </div>
+        )}
+
+        <button
+          aria-label="Next customer story"
+          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--dividers)] bg-[var(--surface)] text-[var(--ink)] transition-colors hover:border-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35"
           disabled={!loop && activeIndex === total - 1}
           onClick={() => goTo(activeIndex + 1)}
-          shape="pill"
-          size="sm"
-          variant="outline"
+          type="button"
         >
-          Next
-        </SmoothButton>
+          <ChevronRight className="size-4" />
+        </button>
       </div>
 
       <div aria-live="polite" className="sr-only">
