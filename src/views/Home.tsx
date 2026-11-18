@@ -1,48 +1,22 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import gsap from "gsap";
 import PagePreloader from "@/components/smoothui/page-preloader";
 import ThemeToggle from "@/components/smoothui/theme-toggle";
 import AIOrbFace from "@/components/smoothui/ai-orb-face";
-import AIConversation from "@/components/smoothui/ai-conversation";
-import AIMessage from "@/components/smoothui/ai-message";
-import AIReasoning from "@/components/smoothui/ai-reasoning";
-import AIToolCall from "@/components/smoothui/ai-tool-call";
-import AITaskList from "@/components/smoothui/ai-task-list";
-import GridLoader from "@/components/smoothui/grid-loader";
-import TiltCard from "@/components/smoothui/tilt-card";
 import type { CoverflowCarouselItem } from "@/components/smoothui/coverflow-carousel";
-import { SITE_CONTENT } from "@/content/site";
+import LearnMoreLink from "@/components/sandip/LearnMoreLink";
+import ProductHighlightsStage from "@/components/sandip/ProductHighlightsStage";
 import {
-  Menu,
-  X,
-  Play,
-  Pause,
-  ChevronRight,
-  Check,
-} from "lucide-react";
-
-// Lazy-load below-the-fold heavy components with ssr: false and matched-height placeholders
-const DynamicSiriOrb = dynamic(() => import("@/components/smoothui/siri-orb"), {
-  ssr: false,
-  loading: () => (
-    <div
-      aria-hidden="true"
-      className="w-[180px] h-[180px] rounded-full bg-[#f5f5f7] border border-[#d6d6d6]"
-    />
-  ),
-});
-
-const DynamicAIOrbFace = dynamic(() => import("@/components/smoothui/ai-orb-face"), {
-  ssr: false,
-  loading: () => (
-    <div
-      aria-hidden="true"
-      className="w-[180px] h-[180px] rounded-full bg-[#f5f5f7] border border-[#d6d6d6]"
-    />
-  ),
-});
+  ConversationalIntelligenceVisual,
+  EcosystemSyncVisual,
+  PipelineVelocityVisual,
+} from "@/components/sandip/FeatureVisuals";
+import DemoModal from "@/components/sandip/DemoModal";
+import { SITE_CONTENT } from "@/content/site";
+import { Check, Menu, X } from "lucide-react";
 
 const DynamicCoverflowCarousel = dynamic(
   () => import("@/components/smoothui/coverflow-carousel"),
@@ -51,9 +25,9 @@ const DynamicCoverflowCarousel = dynamic(
     loading: () => (
       <div
         aria-hidden="true"
-        className="w-full h-[320px] rounded-2xl bg-[#f5f5f7] border border-[#e6e6e8] flex items-center justify-center text-[#707070] text-sm"
+        className="mx-auto flex h-[340px] w-full max-w-[520px] items-center justify-center rounded-[28px] border border-[var(--hairline)] bg-[var(--surface)] text-sm text-[var(--text-secondary)]"
       >
-        Loading stories...
+        Loading customer stories…
       </div>
     ),
   }
@@ -66,7 +40,7 @@ const DynamicKineticTypeScroll = dynamic(
     loading: () => (
       <div
         aria-hidden="true"
-        className="min-h-[44px] flex items-center justify-center text-center apple-feature-heading text-[#1d1d1f] opacity-60"
+        className="mx-auto max-w-[820px] text-center text-[30px] font-semibold leading-[1.16] tracking-[-0.025em] text-[var(--ink)] opacity-75 sm:text-[44px]"
       >
         {SITE_CONTENT.kineticBand.join(" ")}
       </div>
@@ -74,41 +48,132 @@ const DynamicKineticTypeScroll = dynamic(
   }
 );
 
+const PLAN_LABEL_MAP: Record<string, string> = {
+  "plan-growth": "Growth ($1,490/mo)",
+  "plan-scale": "Scale ($3,490/mo)",
+  "plan-enterprise": "Enterprise (Custom)",
+};
+
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
   const [showPreloader, setShowPreloader] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [activeHighlightIndex, setActiveHighlightIndex] = useState(0);
-  const [isCarouselPlaying, setIsCarouselPlaying] = useState(true);
-  const [orbSize, setOrbSize] = useState(280);
-  const carouselTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [orbSize, setOrbSize] = useState(310);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("Scale ($3,490/mo)");
+  const heroRef = useRef<HTMLElement | null>(null);
 
+  const openDemoModal = useCallback((planName = "Scale ($3,490/mo)") => {
+    setSelectedPlan(planName);
+    setDemoModalOpen(true);
+    setNavOpen(false);
+  }, []);
+
+  // Initialize preloader, saved theme preference, and responsive orb sizing
   useEffect(() => {
-    // Check if preloader has already played in this browser session
-    const hasSeenPreloader = sessionStorage.getItem("sandipai_apple_preloader_seen");
-    if (!hasSeenPreloader) {
-      setShowPreloader(true);
-      sessionStorage.setItem("sandipai_apple_preloader_seen", "true");
-    }
+    const rafId = requestAnimationFrame(() => {
+      const savedTheme = localStorage.getItem("sandipai_theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        setTheme(savedTheme);
+        document.documentElement.classList.toggle("dark", savedTheme === "dark");
+      }
+
+      const hasSeenPreloader = sessionStorage.getItem("sandipai_apple_preloader_seen");
+      if (!hasSeenPreloader) {
+        setShowPreloader(true);
+        sessionStorage.setItem("sandipai_apple_preloader_seen", "true");
+      } else {
+        setHeroReady(true);
+      }
+    });
 
     const updateOrbSize = () => {
       const w = window.innerWidth;
       if (w >= 768) {
         setNavOpen(false);
       }
-      if (w >= 1024) {
-        setOrbSize(280);
+      if (w >= 1280) {
+        setOrbSize(330);
+      } else if (w >= 1024) {
+        setOrbSize(300);
       } else if (w >= 640) {
-        setOrbSize(230);
+        setOrbSize(250);
       } else {
-        // Never larger than the column width on mobile
-        setOrbSize(Math.max(140, Math.min(180, w - 48)));
+        setOrbSize(Math.max(180, Math.min(220, w - 64)));
       }
     };
     updateOrbSize();
     window.addEventListener("resize", updateOrbSize);
-    return () => window.removeEventListener("resize", updateOrbSize);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", updateOrbSize);
+    };
   }, []);
+
+  // Choreographed GSAP Hero Entrance (runs once when hero is ready, respects reduced motion)
+  useEffect(() => {
+    if (!heroReady || !heroRef.current) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+      });
+
+      tl.from(".hero-kicker", {
+        y: 12,
+        opacity: 0,
+        duration: 0.45,
+        clearProps: "transform,opacity",
+      })
+        .from(
+          ".hero-title-line",
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.62,
+            stagger: 0.09,
+            clearProps: "transform,opacity",
+          },
+          "-=0.28"
+        )
+        .from(
+          ".hero-body",
+          {
+            y: 14,
+            opacity: 0,
+            duration: 0.52,
+            clearProps: "transform,opacity",
+          },
+          "-=0.38"
+        )
+        .from(
+          ".hero-actions",
+          {
+            y: 12,
+            opacity: 0,
+            duration: 0.48,
+            clearProps: "transform,opacity",
+          },
+          "-=0.34"
+        )
+        .from(
+          ".hero-orb-stage",
+          {
+            scale: 0.95,
+            opacity: 0,
+            duration: 0.72,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          },
+          "-=0.52"
+        );
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, [heroReady]);
 
   // Close mobile navigation on Escape key
   useEffect(() => {
@@ -133,149 +198,187 @@ export default function Home() {
   }, [navOpen]);
 
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    setTheme(newTheme);
-    const root = document.documentElement;
-    if (newTheme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    const resolved = newTheme === "dark" ? "dark" : "light";
+    setTheme(resolved);
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+    localStorage.setItem("sandipai_theme", resolved);
   };
 
-  // Highlights autoplay carousel loop
-  useEffect(() => {
-    if (!isCarouselPlaying) {
-      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
-      return;
-    }
+  const orbColors = useMemo(
+    () =>
+      theme === "dark"
+        ? {
+            body: "#0a84ff",
+            bodyEdge: "#d6ebff",
+            feature: "#0b1220",
+          }
+        : {
+            body: "#2b8af7",
+            bodyEdge: "#f3f8ff",
+            feature: "#1d1d1f",
+          },
+    [theme]
+  );
 
-    carouselTimerRef.current = setInterval(() => {
-      setActiveHighlightIndex((prev) => (prev + 1) % SITE_CONTENT.highlights.cards.length);
-    }, 5500);
+  const headlineLines = useMemo(
+    () => SITE_CONTENT.product.headline.split("\n"),
+    []
+  );
 
-    return () => {
-      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
-    };
-  }, [isCarouselPlaying]);
+  const carouselItems: CoverflowCarouselItem[] = useMemo(
+    () =>
+      SITE_CONTENT.stories.map((story) => ({
+        id: story.id,
+        content: (
+          <article className="flex h-full w-full flex-col justify-between rounded-[28px] border border-[var(--dividers)] bg-[var(--surface)] p-6 text-left sm:p-8">
+            <div>
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <span className="inline-flex items-center rounded-full border border-[var(--hairline)] bg-[var(--pill-blue-soft)] px-3 py-1 text-[12px] font-semibold tabular-nums text-[var(--link)]">
+                  {story.metric}
+                </span>
+                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                  {story.company}
+                </span>
+              </div>
+              <blockquote className="text-[17px] font-normal leading-[1.5] tracking-[-0.015em] text-[var(--ink)] sm:text-[19px]">
+                &ldquo;{story.quote}&rdquo;
+              </blockquote>
+            </div>
 
-  const carouselItems: CoverflowCarouselItem[] = SITE_CONTENT.stories.map((story) => ({
-    id: story.id,
-    content: (
-      <div className="flex h-full w-full flex-col justify-between p-7 bg-white border border-[#d6d6d6] rounded-[28px] text-left shadow-none">
-        <div>
-          <span className="inline-block px-3 py-1 text-[11px] font-semibold text-[#0066cc] bg-[#f5f5f7] border border-[#d6d6d6] rounded-full mb-3">
-            {story.metric}
-          </span>
-          <p className="text-[15px] text-[#1d1d1f] line-clamp-4 leading-[1.47] tracking-[-0.2px] font-normal">
-            &ldquo;{story.quote}&rdquo;
-          </p>
-        </div>
-        <div className="border-t border-[#e6e6e8] pt-3 mt-2">
-          <p className="text-[13px] font-semibold text-[#1d1d1f]">{story.author}</p>
-          <p className="text-[11px] text-[#707070]">{story.role} · {story.company}</p>
-        </div>
-      </div>
-    ),
-  }));
+            <div className="mt-5 flex items-center justify-between border-t border-[var(--hairline)] pt-4">
+              <div>
+                <p className="text-[14px] font-semibold text-[var(--ink)]">
+                  {story.author}
+                </p>
+                <p className="text-[12px] text-[var(--text-secondary)]">
+                  {story.role} · {story.company}
+                </p>
+              </div>
+              <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--outlines)]">
+                Design Partner
+              </span>
+            </div>
+          </article>
+        ),
+      })),
+    []
+  );
 
   return (
-    <div className="relative min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3]/20 overflow-x-clip max-w-full">
-      {/* ── Page Preloader: White background, Ink text, under 1.5s on mobile ── */}
+    <div className="relative min-h-screen max-w-full overflow-x-clip bg-[var(--canvas)] text-[var(--ink)]">
+      {/* Skip link for keyboard accessibility */}
+      <a
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[110] focus:rounded-full focus:bg-[var(--pill-blue)] focus:px-4 focus:py-2 focus:text-xs focus:font-medium focus:text-white"
+        href="#main-content"
+      >
+        Skip to content
+      </a>
+
+      {/* Page Preloader: Clean, fast, session-gated */}
       {showPreloader && (
         <PagePreloader
+          background="bg-[var(--canvas)]"
+          duration={1100}
+          onComplete={() => {
+            setShowPreloader(false);
+            setHeroReady(true);
+          }}
           variant="words"
           words={["Qualify.", "Convert.", "Close."]}
-          duration={1200}
-          background="bg-white"
-          onComplete={() => setShowPreloader(false)}
         />
       )}
 
-      {/* ═════════════════════════════════════════════════════════════════════════
-          1. SINGLE STICKY GLOBAL NAVIGATION (44px, ONLY bar on page)
-          ═════════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          1. STICKY GLOBAL NAVIGATION (44px, single authoritative bar)
+          ═══════════════════════════════════════════════════════════════════════ */}
       <nav
         aria-label="Global"
-        className="sticky top-0 inset-x-0 z-50 h-[44px] bg-white/90 backdrop-blur-md border-b border-[#e6e6e8] transition-colors"
+        className="sticky inset-x-0 top-0 z-50 h-[48px] border-b border-[var(--nav-border)] bg-[var(--nav-surface)] backdrop-blur-md transition-colors"
       >
-        <div className="max-w-[1024px] mx-auto h-full px-4 flex items-center justify-between text-[12px] font-normal tracking-[-0.01em]">
-          {/* Left: SandipAI Wordmark (small, 17px/600) */}
+        <div className="mx-auto flex h-full max-w-[1080px] items-center justify-between px-4 sm:px-6">
           <a
+            className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em] text-[var(--ink)] transition-opacity hover:opacity-80"
             href="#hero"
-            className="text-[17px] font-semibold tracking-tight text-[#1d1d1f] hover:opacity-80 transition-opacity"
           >
+            <span
+              aria-hidden="true"
+              className="size-2 rounded-full bg-[var(--pill-blue)]"
+            />
             {SITE_CONTENT.globalNav.brand}
           </a>
 
-          {/* Center (Desktop only): 4 links (hidden on mobile) */}
-          <div className="hidden md:flex items-center gap-8 text-[#1d1d1f]">
-            {SITE_CONTENT.globalNav.links.map((link, idx) => (
+          <div className="hidden items-center gap-8 md:flex">
+            {SITE_CONTENT.globalNav.links.map((link) => (
               <a
-                key={idx}
+                className="apple-nav-link text-[var(--ink-muted)] transition-colors hover:text-[var(--ink)]"
                 href={link.href}
-                className="apple-nav-link text-[#1d1d1f] hover:text-[#0066cc] transition-colors"
+                key={link.href}
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          {/* Right (Desktop only): filled #0071e3 pill (hidden on mobile) */}
-          <div className="hidden md:flex items-center gap-3">
-            <a
-              href="#pricing"
-              className="apple-pill-btn"
+          <div className="hidden items-center gap-3 md:flex">
+            <button
+              className="apple-pill-btn py-1.5 text-[12px]"
+              onClick={() => openDemoModal()}
+              type="button"
             >
               Get a demo
-            </a>
+            </button>
           </div>
 
-          {/* Right (Mobile only): 24px hamburger icon with 44x44px tap target */}
           <button
-            type="button"
-            aria-label={navOpen ? "Close menu" : "Open menu"}
-            aria-expanded={navOpen}
             aria-controls="mobile-nav-menu"
+            aria-expanded={navOpen}
+            aria-label={navOpen ? "Close menu" : "Open menu"}
+            className="-mr-2 flex h-[44px] w-[44px] items-center justify-center text-[var(--ink)] transition-colors hover:text-[var(--link)] md:hidden"
             onClick={() => setNavOpen(!navOpen)}
-            className="md:hidden flex items-center justify-center w-[44px] h-[44px] -mr-2 text-[#1d1d1f] hover:text-[#0066cc] focus:outline-none transition-colors"
+            type="button"
           >
-            <div className="relative size-6 flex items-center justify-center">
+            <div className="relative flex size-6 items-center justify-center">
               <Menu
-                className={`size-6 absolute inset-0 transition-all duration-200 motion-reduce:transition-none ${
-                  navOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"
+                className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
+                  navOpen
+                    ? "rotate-90 scale-75 opacity-0"
+                    : "rotate-0 scale-100 opacity-100"
                 }`}
               />
               <X
-                className={`size-6 absolute inset-0 transition-all duration-200 motion-reduce:transition-none ${
-                  navOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"
+                className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
+                  navOpen
+                    ? "rotate-0 scale-100 opacity-100"
+                    : "-rotate-90 scale-75 opacity-0"
                 }`}
               />
             </div>
           </button>
         </div>
 
-        {/* Mobile Open State: Full-width sheet directly under bar, #fafafc, 1px #e6e6e8 edge, blur(20px), no shadow */}
+        {/* Mobile Sheet */}
         {navOpen && (
           <>
-            {/* Backdrop to capture outside taps and close menu */}
             <div
-              className="md:hidden fixed inset-0 top-[44px] z-40 bg-black/5"
-              onClick={() => setNavOpen(false)}
               aria-hidden="true"
+              className="fixed inset-0 top-[48px] z-40 bg-black/15 md:hidden"
+              onClick={() => setNavOpen(false)}
             />
             <div
+              className="mobile-sheet-animation absolute inset-x-0 top-[48px] z-50 border-b border-[var(--nav-border)] bg-[var(--nav-sheet)] px-6 py-6 backdrop-blur-[20px] md:hidden"
               id="mobile-nav-menu"
-              className="md:hidden absolute top-[44px] inset-x-0 z-50 bg-[#fafafc] border-b border-[#e6e6e8] backdrop-blur-[20px] px-6 py-6 shadow-none mobile-sheet-animation"
             >
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   {SITE_CONTENT.globalNav.links.map((link, idx) => (
-                    <React.Fragment key={idx}>
-                      {idx > 0 && <div className="h-[1px] bg-[#e6e6e8] w-full" />}
+                    <React.Fragment key={link.href}>
+                      {idx > 0 && (
+                        <div className="h-[1px] w-full bg-[var(--hairline)]" />
+                      )}
                       <a
+                        className="flex h-[48px] items-center text-[17px] font-medium text-[var(--ink)] transition-colors hover:text-[var(--link)]"
                         href={link.href}
                         onClick={() => setNavOpen(false)}
-                        className="flex items-center h-[44px] text-[17px] font-medium text-[#1d1d1f] hover:text-[#0066cc] transition-colors"
                       >
                         {link.label}
                       </a>
@@ -283,14 +386,14 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="pt-2">
-                  <a
-                    href="#pricing"
-                    onClick={() => setNavOpen(false)}
-                    className="flex items-center justify-center w-full h-[44px] rounded-full bg-[#0071e3] text-white text-[12px] font-medium hover:bg-[#0077ed] transition-colors"
+                <div className="pt-1">
+                  <button
+                    className="apple-pill-btn h-[44px] w-full text-[14px]"
+                    onClick={() => openDemoModal()}
+                    type="button"
                   >
                     Get a demo
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -298,444 +401,327 @@ export default function Home() {
         )}
       </nav>
 
-      <main>
-        {/* ═════════════════════════════════════════════════════════════════════════
-            2. HERO SECTION (Two columns on desktop, 100svh, background grid lines with mask)
-            ═════════════════════════════════════════════════════════════════════════ */}
+      <main id="main-content">
+        {/* ═════════════════════════════════════════════════════════════════════
+            2. HERO SECTION (Editorial typography + signature SandipAI optical orb)
+            ═════════════════════════════════════════════════════════════════════ */}
         <section
+          className="relative overflow-hidden bg-[var(--canvas)] px-4 pt-12 pb-16 [contain:paint] sm:px-6 md:flex md:min-h-[min(calc(100svh-48px),780px)] md:items-center md:py-16 lg:px-8"
           id="hero"
-          className="relative bg-white pt-6 pb-12 md:py-0 md:min-h-[calc(100svh-44px)] md:flex md:items-center md:justify-center px-4 sm:px-6 lg:px-8 overflow-hidden [contain:paint]"
+          ref={heroRef}
         >
-          {/* Subtle line grid behind hero: 1px in #d6d6d6, 64px cells, radial fade centered on character */}
-          <div className="hero-grid-lines" aria-hidden="true" />
+          <div aria-hidden="true" className="hero-grid-lines" />
 
-          <div className="relative z-10 max-w-[1080px] w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 lg:gap-12 items-center">
-            {/* LEFT COLUMN: Kicker, Headline, Body, CTAs (all left-aligned) */}
-            <div className="md:col-span-7 flex flex-col items-start text-left">
-              {/* Short descriptive kicker */}
-              <p className="apple-kicker text-[#707070] mb-3">
+          <div className="relative z-10 mx-auto grid w-full max-w-[1080px] grid-cols-1 items-center gap-12 md:grid-cols-12 md:gap-8 lg:gap-12">
+            {/* Left Column: Composed Headline, Body & Actions */}
+            <div className="flex flex-col items-start text-left md:col-span-7">
+              <p className="hero-kicker apple-kicker mb-4 text-[var(--text-secondary)]">
                 {SITE_CONTENT.product.kicker}
               </p>
 
-              {/* Headline: clamp(40px, 6vw, 80px), weight 600, tracking -1.2px */}
-              <h1 className="apple-hero-headline text-[#1d1d1f] mb-4 whitespace-pre-line text-left">
-                {SITE_CONTENT.product.headline}
+              <h1 className="apple-hero-headline mb-5 text-left text-[var(--ink)]">
+                {headlineLines.map((line, i) => (
+                  <span
+                    className={`hero-title-line block ${
+                      i === 1 ? "text-[var(--ink-muted)]" : "text-[var(--ink)]"
+                    }`}
+                    key={line}
+                  >
+                    {line}
+                  </span>
+                ))}
               </h1>
 
-              {/* Body paragraph */}
-              <p className="apple-body text-[#707070] max-w-xl mb-6 text-left">
+              <p className="hero-body apple-body mb-8 max-w-[520px] text-left text-[var(--text-secondary)]">
                 {SITE_CONTENT.product.heroBody}
               </p>
 
-              {/* Two CTAs: filled #0071e3 pill + #0066cc text link */}
-              <div className="flex flex-wrap items-center gap-5">
-                <a
-                  href="#pricing"
-                  className="apple-pill-btn px-5 py-2 text-[12px]"
+              <div className="hero-actions flex flex-wrap items-center gap-x-6 gap-y-3">
+                <button
+                  className="apple-pill-btn px-6 py-3 text-[14px]"
+                  onClick={() => openDemoModal()}
+                  type="button"
                 >
-                  Get a demo
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="apple-text-link"
-                >
-                  <span>Watch how it works</span>
-                  <ChevronRight className="size-3.5 mt-0.5" />
-                </a>
+                  {SITE_CONTENT.product.pricingCallout.ctaText}
+                </button>
+                <LearnMoreLink href={SITE_CONTENT.product.heroLinks[0].href}>
+                  {SITE_CONTENT.product.heroLinks[0].label}
+                </LearnMoreLink>
               </div>
             </div>
 
-            {/* RIGHT COLUMN: AI Character (ai-orb-face) large, centered, gaze-tracking */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center w-full max-w-full overflow-hidden">
+            {/* Right Column: SandipAI Optical Character & Pricing Capsule */}
+            <div className="hero-orb-stage flex w-full max-w-full flex-col items-center justify-center md:col-span-5">
               <div
-                className="flex items-center justify-center p-2 max-w-full overflow-hidden"
-                style={{ width: orbSize, height: orbSize }}
+                className="flex max-w-full items-center justify-center"
+                style={{ height: orbSize, width: orbSize }}
               >
                 <AIOrbFace
+                  aria-label="SandipAI autonomous sales agent visual signature"
+                  colors={orbColors}
+                  gaze={true}
+                  interactive={true}
+                  showRing={true}
                   size={orbSize}
                   state="idle"
-                  gaze={true}
-                  colors={{
-                    body: "oklch(75% 0.16 230)",
-                    bodyEdge: "oklch(96% 0.02 230)",
-                    feature: "#1d1d1f",
-                  }}
                 />
               </div>
 
-              {/* Small subtle pricing callout placed small beneath the character */}
-              <div className="mt-2 inline-flex items-center px-3.5 py-1 rounded-full bg-[#f5f5f7] border border-[#d6d6d6] text-[12px] text-[#707070]">
-                {SITE_CONTENT.product.pricingCallout.priceText}
+              <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-[var(--dividers)] bg-[var(--alt-band)] px-4 py-1.5 text-[12px] font-medium text-[var(--text-secondary)]">
+                <span className="size-1.5 rounded-full bg-[var(--success)]" />
+                <span className="tabular-nums">
+                  {SITE_CONTENT.product.pricingCallout.priceText}
+                </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ═════════════════════════════════════════════════════════════════════════
-            3. HIGHLIGHTS BAND (Full-width #f5f5f7, 28px white cards, carousel controls)
-            ═════════════════════════════════════════════════════════════════════════ */}
-        <section id="how-it-works" className="scroll-mt-[56px] bg-[#f5f5f7] py-[90px] px-4">
-          <div className="max-w-[1024px] mx-auto">
-            {/* Highlights Header */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-              <h2 className="apple-feature-heading text-[#1d1d1f]">
-                {SITE_CONTENT.highlights.heading}
-              </h2>
-              <a
-                href={SITE_CONTENT.highlights.actionLink.href}
-                className="apple-text-link"
-              >
-                <span>{SITE_CONTENT.highlights.actionLink.label}</span>
-                <ChevronRight className="size-3.5 mt-0.5" />
-              </a>
-            </div>
-
-            {/* Highlights Card Stage (Large 28px white card, NO shadow) */}
-            <div className="apple-card bg-white border border-[#e6e6e8] min-h-[520px] flex flex-col justify-between overflow-hidden max-w-full [touch-action:pan-y]">
-              {/* Card Title & Content */}
-              <div className="mb-6">
-                <span className="text-[14px] font-semibold uppercase tracking-wider text-[#707070]">
-                  {SITE_CONTENT.highlights.cards[activeHighlightIndex].kicker}
-                </span>
-                <h3 className="apple-feature-heading text-[#1d1d1f] mt-2 mb-3">
-                  {SITE_CONTENT.highlights.cards[activeHighlightIndex].title}
-                </h3>
-                <p className="apple-body text-[#707070] max-w-2xl">
-                  {SITE_CONTENT.highlights.cards[activeHighlightIndex].description}
+        {/* ═════════════════════════════════════════════════════════════════════
+            3. PRODUCT HIGHLIGHTS — Connected 4-Stage Interactive Sales Story
+            ═════════════════════════════════════════════════════════════════════ */}
+        <section
+          className="scroll-mt-[56px] bg-[var(--alt-band)] px-4 py-[88px] sm:px-6 lg:py-[104px]"
+          id="how-it-works"
+        >
+          <div className="mx-auto max-w-[1080px]">
+            <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <h2 className="apple-feature-heading text-[var(--ink)]">
+                  {SITE_CONTENT.highlights.heading}
+                </h2>
+                <p className="mt-2 text-[16px] text-[var(--text-secondary)]">
+                  Follow one enterprise inquiry from first question to booked calendar invite.
                 </p>
               </div>
-
-              {/* Dynamic Visual Content depending on active tab */}
-              <div className="w-full bg-[#f5f5f7] rounded-[20px] p-6 border border-[#e6e6e8] min-h-[300px] flex items-center justify-center">
-                {activeHighlightIndex === 0 && (
-                  <div className="w-full max-w-2xl bg-white rounded-2xl p-4 border border-[#d6d6d6]">
-                    <div className="flex items-center justify-between pb-3 border-b border-[#e6e6e8] mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-[#30d158]" />
-                        <span className="text-[13px] font-semibold text-[#1d1d1f]">Live Inbound Sales Dialogue</span>
-                      </div>
-                      <GridLoader size={14} color="#0071e3" pattern="plus-hollow" />
-                    </div>
-                    <AIConversation className="h-[200px] space-y-3">
-                      <AIMessage from="user" timestamp="10:14 AM" copyText="Can SandipAI handle SOC 2 compliance questions?">
-                        Can SandipAI handle SOC 2 compliance questions and schedule a technical demo?
-                      </AIMessage>
-                      <AIMessage from="assistant" timestamp="10:14 AM" copyText="Yes! We are SOC 2 Type II certified.">
-                        Yes, absolutely. SandipAI is SOC 2 Type II certified and trained on security documentation. I have verified our Solutions Engineer is available Thursday at 2:00 PM EST. Would you like me to book that slot?
-                      </AIMessage>
-                    </AIConversation>
-                  </div>
-                )}
-
-                {activeHighlightIndex === 1 && (
-                  <div className="w-full max-w-xl bg-white rounded-2xl p-5 border border-[#d6d6d6]">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[12px] font-semibold text-[#707070] uppercase">
-                        Reasoning Engine Verification
-                      </span>
-                      <GridLoader size={14} color="#0071e3" pattern="breathing" />
-                    </div>
-                    <AIReasoning defaultOpen={true} duration={1.2}>
-                      <div className="space-y-2 py-1 text-[13px] text-[#1d1d1f]">
-                        <p>1. Analyzing prospect inquiry: Company sizing (60 seats) indicates Enterprise tier.</p>
-                        <p>2. Checking compliance requirement: SOC 2 Type II whitepaper verified in knowledge base.</p>
-                        <p>3. Calling Google Calendar API: Found open slot on Thursday at 2:00 PM EST.</p>
-                      </div>
-                    </AIReasoning>
-                  </div>
-                )}
-
-                {activeHighlightIndex === 2 && (
-                  <div className="w-full max-w-xl bg-white rounded-2xl p-5 border border-[#d6d6d6] overflow-hidden">
-                    <AIToolCall
-                      name="crm_lookup_and_calendar_schedule"
-                      summary="2 operations executed · 180ms"
-                      status="success"
-                      defaultOpen={true}
-                      args={
-                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#1d1d1f] max-w-full overflow-x-auto whitespace-pre-wrap break-all">
-                          {`{ "lead": "team@acmecorp.com", "seats": 60, "targetSlot": "Thursday 14:00 EST" }`}
-                        </pre>
-                      }
-                      result={
-                        <pre className="text-[12px] p-2 bg-[#f5f5f7] rounded border border-[#d6d6d6] text-[#0066cc] max-w-full overflow-x-auto whitespace-pre-wrap break-all">
-                          {`{ "meetingConfirmed": true, "salesforceOpportunity": "$72,000 ARR" }`}
-                        </pre>
-                      }
-                    />
-                  </div>
-                )}
-
-                {activeHighlightIndex === 3 && (
-                  <div className="w-full max-w-xl bg-white rounded-2xl p-5 border border-[#d6d6d6]">
-                    <AITaskList
-                      label="Autonomous Pipeline Plan"
-                      tasks={[
-                        { id: "t1", label: "Enrich domain & firmographic score", note: "98/100", status: "done" },
-                        { id: "t2", label: "Verify SOC 2 and GDPR boundary requirements", note: "Confirmed", status: "done" },
-                        { id: "t3", label: "Check Solutions Architect calendar slots", note: "2 slots found", status: "done" },
-                        { id: "t4", label: "Dispatch Google Meet calendar invite", note: "Sent", status: "done" },
-                        { id: "t5", label: "Sync enriched opportunity record to Salesforce", note: "Logged", status: "done" },
-                      ]}
-                      className="border-0 p-0 bg-transparent"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Translucent Playback Control Pill (dots + play/pause) */}
-              <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#e6e6e8]">
-                <div className="flex items-center gap-2">
-                  {SITE_CONTENT.highlights.cards.map((_, idx) => (
-                    <button
-                      key={idx}
-                      aria-label={`Jump to slide ${idx + 1}`}
-                      onClick={() => setActiveHighlightIndex(idx)}
-                      className={`h-2 rounded-full transition-all ${
-                        activeHighlightIndex === idx
-                          ? "w-8 bg-[#1d1d1f]"
-                          : "w-2 bg-[#d6d6d6] hover:bg-[#86868b]"
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <div className="inline-flex items-center gap-3 bg-white border border-[#d6d6d6] rounded-full px-3 py-1.5 text-[12px]">
-                  <span className="text-[#707070] font-medium">
-                    {activeHighlightIndex + 1} of {SITE_CONTENT.highlights.cards.length}
-                  </span>
-                  <button
-                    aria-label={isCarouselPlaying ? "Pause carousel" : "Play carousel"}
-                    onClick={() => setIsCarouselPlaying(!isCarouselPlaying)}
-                    className="p-1 rounded-full text-[#1d1d1f] hover:text-[#0066cc]"
-                  >
-                    {isCarouselPlaying ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-                  </button>
-                </div>
-              </div>
+              <LearnMoreLink href={SITE_CONTENT.highlights.actionLink.href}>
+                {SITE_CONTENT.highlights.actionLink.label}
+              </LearnMoreLink>
             </div>
+
+            <ProductHighlightsStage />
           </div>
         </section>
 
-        {/* ═════════════════════════════════════════════════════════════════════════
-            4. FEATURES / EDITORIAL SECTIONS (White canvas, kicker, 40px statement, tilt-card visual)
-            ═════════════════════════════════════════════════════════════════════════ */}
-        <section id="features" className="scroll-mt-[56px] bg-white py-[90px] px-4">
-          <div className="max-w-[1024px] mx-auto space-y-[90px]">
-            {/* Section 1: Visual Right */}
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <p className="apple-kicker text-[#707070] mb-2">
+        {/* ═════════════════════════════════════════════════════════════════════
+            4. EDITORIAL FEATURE STORIES + KINETIC TYPOGRAPHY STATEMENT
+            ═════════════════════════════════════════════════════════════════════ */}
+        <section
+          className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
+          id="features"
+        >
+          <div className="mx-auto max-w-[1080px] space-y-[96px] lg:space-y-[120px]">
+            {/* Feature 1: Conversational Intelligence */}
+            <div
+              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
+              id="conversations"
+            >
+              <div className="lg:col-span-5">
+                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[0].kicker}
                 </p>
-                <h3 className="apple-feature-heading text-[#1d1d1f] mb-4">
+                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
                   {SITE_CONTENT.editorialSections[0].heading}
                 </h3>
-                <p className="apple-body text-[#707070] mb-6">
+                <p className="apple-body mb-6 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[0].body}
                 </p>
-                <a href={SITE_CONTENT.editorialSections[0].linkHref} className="apple-text-link">
-                  <span>{SITE_CONTENT.editorialSections[0].linkText}</span>
-                  <ChevronRight className="size-3.5 mt-0.5" />
-                </a>
+                <LearnMoreLink href={SITE_CONTENT.editorialSections[0].linkHref}>
+                  {SITE_CONTENT.editorialSections[0].linkText}
+                </LearnMoreLink>
               </div>
-              <div className="flex justify-center">
-                <TiltCard
-                  maxTilt={8}
-                  glare={false}
-                  className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
-                >
-                  <div className="w-[180px] h-[180px] flex items-center justify-center">
-                    <DynamicSiriOrb size="180px" state="idle" />
-                  </div>
-                  <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
-                    {SITE_CONTENT.editorialSections[0].statsBadge}
-                  </span>
-                </TiltCard>
+              <div className="lg:col-span-7">
+                <ConversationalIntelligenceVisual
+                  statsBadge={SITE_CONTENT.editorialSections[0].statsBadge}
+                />
               </div>
             </div>
 
-            {/* Kinetic Type Scroll: Single statement band between sections (Ink on White) */}
-            <div className="py-12 border-y border-[#d6d6d6] text-center max-w-full overflow-hidden">
-              <DynamicKineticTypeScroll
-                words={SITE_CONTENT.kineticBand}
-                align="center"
-                className="apple-feature-heading text-[#1d1d1f]"
-              />
+            {/* Editorial Kinetic Typography Moment */}
+            <div className="border-y border-[var(--dividers)] py-16 sm:py-20">
+              <div className="mx-auto max-w-[880px]">
+                <DynamicKineticTypeScroll
+                  align="center"
+                  className="text-[30px] font-semibold leading-[1.15] tracking-[-0.028em] text-[var(--ink)] sm:text-[42px] lg:text-[48px]"
+                  words={SITE_CONTENT.kineticBand}
+                />
+              </div>
             </div>
 
-            {/* Section 2: Visual Left */}
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="order-2 md:order-1 flex justify-center">
-                <TiltCard
-                  maxTilt={8}
-                  glare={false}
-                  className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
-                >
-                  <div className="w-[180px] h-[180px] flex items-center justify-center">
-                    <DynamicAIOrbFace
-                      size={180}
-                      state="streaming"
-                      gaze={false}
-                      colors={{
-                        body: "oklch(75% 0.16 230)",
-                        bodyEdge: "oklch(96% 0.02 230)",
-                        feature: "#1d1d1f",
-                      }}
-                    />
-                  </div>
-                  <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
-                    {SITE_CONTENT.editorialSections[1].statsBadge}
-                  </span>
-                </TiltCard>
+            {/* Feature 2: Pipeline Velocity */}
+            <div
+              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
+              id="pipeline"
+            >
+              <div className="order-2 lg:order-1 lg:col-span-7">
+                <PipelineVelocityVisual
+                  statsBadge={SITE_CONTENT.editorialSections[1].statsBadge}
+                />
               </div>
-              <div className="order-1 md:order-2">
-                <p className="apple-kicker text-[#707070] mb-2">
+              <div className="order-1 lg:order-2 lg:col-span-5">
+                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[1].kicker}
                 </p>
-                <h3 className="apple-feature-heading text-[#1d1d1f] mb-4">
+                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
                   {SITE_CONTENT.editorialSections[1].heading}
                 </h3>
-                <p className="apple-body text-[#707070] mb-6">
+                <p className="apple-body mb-6 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[1].body}
                 </p>
-                <a href={SITE_CONTENT.editorialSections[1].linkHref} className="apple-text-link">
-                  <span>{SITE_CONTENT.editorialSections[1].linkText}</span>
-                  <ChevronRight className="size-3.5 mt-0.5" />
-                </a>
+                <LearnMoreLink href={SITE_CONTENT.editorialSections[1].linkHref}>
+                  {SITE_CONTENT.editorialSections[1].linkText}
+                </LearnMoreLink>
               </div>
             </div>
 
-            {/* Section 3: Visual Right */}
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <p className="apple-kicker text-[#707070] mb-2">
+            {/* Feature 3: Ecosystem Sync */}
+            <div
+              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
+              id="integrations"
+            >
+              <div className="lg:col-span-5">
+                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[2].kicker}
                 </p>
-                <h3 className="apple-feature-heading text-[#1d1d1f] mb-4">
+                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
                   {SITE_CONTENT.editorialSections[2].heading}
                 </h3>
-                <p className="apple-body text-[#707070] mb-6">
+                <p className="apple-body mb-6 text-[var(--text-secondary)]">
                   {SITE_CONTENT.editorialSections[2].body}
                 </p>
-                <a href={SITE_CONTENT.editorialSections[2].linkHref} className="apple-text-link">
-                  <span>{SITE_CONTENT.editorialSections[2].linkText}</span>
-                  <ChevronRight className="size-3.5 mt-0.5" />
-                </a>
+                <LearnMoreLink href={SITE_CONTENT.editorialSections[2].linkHref}>
+                  {SITE_CONTENT.editorialSections[2].linkText}
+                </LearnMoreLink>
               </div>
-              <div className="flex justify-center">
-                <TiltCard
-                  maxTilt={8}
-                  glare={false}
-                  className="w-full max-w-[420px] bg-[#f5f5f7] border border-[#d6d6d6] rounded-[28px] p-8 flex flex-col items-center justify-center text-center shadow-none"
-                >
-                  <div className="w-[180px] h-[180px] flex items-center justify-center">
-                    <DynamicSiriOrb size="180px" state="done" />
-                  </div>
-                  <span className="mt-6 inline-block px-3.5 py-1 text-[12px] font-semibold text-[#0066cc] bg-white border border-[#d6d6d6] rounded-full">
-                    {SITE_CONTENT.editorialSections[2].statsBadge}
-                  </span>
-                </TiltCard>
+              <div className="lg:col-span-7">
+                <EcosystemSyncVisual
+                  statsBadge={SITE_CONTENT.editorialSections[2].statsBadge}
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* ═════════════════════════════════════════════════════════════════════════
-            5. CUSTOMER STORIES (#f5f5f7 band with coverflow-carousel)
-            ═════════════════════════════════════════════════════════════════════════ */}
-        <section id="customers" className="scroll-mt-[56px] bg-[#f5f5f7] py-[90px] px-4 text-center">
-          <div className="max-w-[1024px] mx-auto">
-            <p className="apple-kicker text-[#707070] mb-2">Customer Impact</p>
-            <h2 className="apple-feature-heading text-[#1d1d1f] mb-4">
+        {/* ═════════════════════════════════════════════════════════════════════
+            5. CUSTOMER IMPACT — Balanced Coverflow Carousel
+            ═════════════════════════════════════════════════════════════════════ */}
+        <section
+          className="scroll-mt-[56px] bg-[var(--alt-band)] px-4 py-[96px] text-center sm:px-6 lg:py-[112px]"
+          id="customers"
+        >
+          <div className="mx-auto max-w-[1080px]">
+            <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
+              Customer Impact
+            </p>
+            <h2 className="apple-feature-heading mb-4 text-[var(--ink)]">
               Proven on modern sales floors.
             </h2>
-            <p className="apple-body text-[#707070] max-w-lg mx-auto mb-12">
-              Browse real-world qualification metrics from revenue teams scaling pipeline volume.
+            <p className="apple-body mx-auto mb-12 max-w-[540px] text-[var(--text-secondary)]">
+              Browse real-world qualification metrics from revenue teams scaling
+              pipeline volume.
             </p>
 
             <div className="w-full max-w-full overflow-hidden [touch-action:pan-y]">
               <DynamicCoverflowCarousel
-                items={carouselItems}
-                depth={120}
-                rotation={28}
-                spacing={250}
                 autoplay={true}
+                autoplayDelay={5500}
+                className="py-2"
+                depth={130}
+                items={carouselItems}
                 loop={true}
-                className="py-4"
+                rotation={18}
+                scaleStep={0.11}
+                spacing={370}
               />
             </div>
           </div>
         </section>
 
-        {/* ═════════════════════════════════════════════════════════════════════════
-            6. PRICING (Three white 28px cards on white canvas, NO shadows)
-            ═════════════════════════════════════════════════════════════════════════ */}
-        <section id="pricing" className="scroll-mt-[56px] bg-white py-[90px] px-4">
-          <div className="max-w-[1024px] mx-auto">
-            <div className="text-center mb-16">
-              <p className="apple-kicker text-[#707070] mb-2">Simple Pricing</p>
-              <h2 className="apple-feature-heading text-[#1d1d1f] mb-3">
+        {/* ═════════════════════════════════════════════════════════════════════
+            6. PRICING — Crisp Three-Tier Architecture
+            ═════════════════════════════════════════════════════════════════════ */}
+        <section
+          className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
+          id="pricing"
+        >
+          <div className="mx-auto max-w-[1080px]">
+            <div className="mb-14 text-center">
+              <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
+                Simple Pricing
+              </p>
+              <h2 className="apple-feature-heading mb-3 text-[var(--ink)]">
                 Choose the plan that fits your growth.
               </h2>
-              <p className="apple-body text-[#707070]">
-                All plans include autonomous meeting booking and bi-directional CRM sync.
+              <p className="apple-body mx-auto max-w-[540px] text-[var(--text-secondary)]">
+                All plans include autonomous meeting booking and bi-directional
+                CRM sync.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
               {SITE_CONTENT.pricing.map((plan) => (
                 <div
-                  key={plan.id}
-                  className={`apple-card bg-white rounded-[28px] p-[28px] border flex flex-col justify-between ${
+                  className={`flex flex-col justify-between rounded-[28px] p-7 transition-colors ${
                     plan.recommended
-                      ? "border-2 border-[#0071e3]"
-                      : "border-[#d6d6d6]"
+                      ? "border-2 border-[var(--pill-blue)] bg-[var(--surface)]"
+                      : "border border-[var(--dividers)] bg-[var(--surface-subtle)] hover:border-[var(--outlines)]"
                   }`}
+                  key={plan.id}
                 >
                   <div>
-                    {plan.recommended && (
-                      <span className="inline-block text-[11px] font-semibold text-[#0071e3] uppercase tracking-wider mb-2">
-                        Recommended
-                      </span>
-                    )}
-                    <h3 className="text-[24px] font-semibold text-[#1d1d1f]">
-                      {plan.name}
-                    </h3>
-                    <p className="text-[13px] text-[#707070] mt-1 mb-6 min-h-[38px]">
-                      {plan.description}
-                    </p>
-
-                    <div className="flex items-baseline gap-1 my-4">
-                      <span className="text-[44px] font-semibold tracking-tight text-[#1d1d1f]">
-                        {plan.price}
-                      </span>
-                      {plan.period && (
-                        <span className="text-[15px] text-[#707070]">{plan.period}</span>
+                    <div className="mb-3 flex h-6 items-center justify-between">
+                      <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
+                        {plan.name}
+                      </h3>
+                      {plan.recommended && (
+                        <span className="rounded-full bg-[var(--pill-blue-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--link)]">
+                          Recommended
+                        </span>
                       )}
                     </div>
 
-                    <div className="space-y-3 pt-6 border-t border-[#e6e6e8]">
-                      {plan.features.map((feature, fIdx) => (
-                        <div key={fIdx} className="flex items-start gap-2.5 text-[13px] text-[#1d1d1f]">
-                          <Check className="size-4 shrink-0 text-[#0071e3] mt-0.5" />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
+                    <p className="min-h-[44px] text-[14px] leading-[1.5] text-[var(--text-secondary)]">
+                      {plan.description}
+                    </p>
+
+                    <div className="my-6 flex items-baseline gap-1.5">
+                      <span className="text-[42px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--ink)]">
+                        {plan.price}
+                      </span>
+                      {plan.period && (
+                        <span className="text-[15px] text-[var(--text-secondary)]">
+                          {plan.period}
+                        </span>
+                      )}
                     </div>
+
+                    <ul className="space-y-3 border-t border-[var(--hairline)] pt-6">
+                      {plan.features.map((feature) => (
+                        <li
+                          className="flex items-start gap-2.5 text-[14px] leading-[1.45] text-[var(--ink)]"
+                          key={feature}
+                        >
+                          <Check className="mt-0.5 size-4 shrink-0 text-[var(--pill-blue)]" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  <div className="mt-8">
-                    <a
-                      href="#pricing"
+                  <div className="mt-8 pt-2">
+                    <button
                       className={
                         plan.recommended
-                          ? "apple-pill-btn w-full text-center py-2.5 text-[12px]"
-                          : "apple-outline-pill-btn w-full text-center py-2.5 text-[12px]"
+                          ? "apple-pill-btn w-full py-3 text-[13px]"
+                          : "apple-outline-pill-btn w-full py-3 text-[13px]"
                       }
+                      onClick={() =>
+                        openDemoModal(PLAN_LABEL_MAP[plan.id] ?? plan.name)
+                      }
+                      type="button"
                     >
                       {plan.ctaText}
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -743,56 +729,79 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ═════════════════════════════════════════════════════════════════════════
-            7. FINAL CTA (Centered 80px statement, filled pill, siri-orb below)
-            ═════════════════════════════════════════════════════════════════════════ */}
-        <section id="cta" className="scroll-mt-[56px] bg-white py-[90px] px-4 text-center">
-          <div className="max-w-[840px] mx-auto flex flex-col items-center">
-            <h2 className="apple-hero-headline text-[#1d1d1f] mb-6">
+        {/* ═════════════════════════════════════════════════════════════════════
+            7. FINAL CTA — Cohesive Closing Statement with Signature Mark
+            ═════════════════════════════════════════════════════════════════════ */}
+        <section
+          className="relative scroll-mt-[56px] overflow-hidden border-t border-[var(--hairline)] bg-[var(--canvas)] px-4 py-[96px] text-center sm:px-6 lg:py-[120px]"
+          id="cta"
+        >
+          <div aria-hidden="true" className="cta-radial-lines" />
+
+          <div className="relative z-10 mx-auto flex max-w-[780px] flex-col items-center">
+            <div className="mb-8 flex size-[132px] items-center justify-center">
+              <AIOrbFace
+                aria-label="SandipAI signature emblem"
+                colors={orbColors}
+                gaze={true}
+                interactive={true}
+                showRing={true}
+                size={132}
+                state="idle"
+              />
+            </div>
+
+            <h2 className="apple-cta-headline mb-5 text-[var(--ink)]">
               {SITE_CONTENT.finalCta.headline}
             </h2>
 
-            <p className="apple-body text-[#707070] max-w-xl mx-auto mb-8">
+            <p className="apple-body mx-auto mb-8 max-w-[540px] text-[var(--text-secondary)]">
               {SITE_CONTENT.finalCta.body}
             </p>
 
-            <a href="#pricing" className="apple-pill-btn px-8 py-3 text-[14px] mb-12">
-              {SITE_CONTENT.finalCta.ctaText}
-            </a>
-
-            {/* Siri Orb centerpiece below the button */}
-            <div className="pt-4 flex items-center justify-center">
-              <div className="w-[160px] h-[160px] flex items-center justify-center">
-                <DynamicSiriOrb size="160px" state="idle" />
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-5">
+              <button
+                className="apple-pill-btn px-8 py-3.5 text-[14px]"
+                onClick={() => openDemoModal()}
+                type="button"
+              >
+                {SITE_CONTENT.finalCta.ctaText}
+              </button>
+              <LearnMoreLink href="#pricing">Compare plans</LearnMoreLink>
             </div>
           </div>
         </section>
       </main>
 
-      {/* ═════════════════════════════════════════════════════════════════════════
-          10. FOOTER (#f5f5f7, small 12px links in columns, legal text in #707070)
-          ═════════════════════════════════════════════════════════════════════════ */}
-      <footer id="footer" className="bg-[#f5f5f7] border-t border-[#d6d6d6] pt-10 pb-16 px-4 text-[12px] text-[#707070]">
-        <div className="max-w-[1024px] mx-auto">
+      {/* ═══════════════════════════════════════════════════════════════════════
+          8. FOOTER — Comfortable Readability, Working Anchors & Theme Toggle
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <footer
+        className="border-t border-[var(--dividers)] bg-[var(--alt-band)] px-4 pt-12 pb-16 text-[var(--text-secondary)] sm:px-6"
+        id="footer"
+      >
+        <div className="mx-auto max-w-[1080px]">
           {/* Numbered Footnotes */}
-          <div className="space-y-2 pb-8 border-b border-[#d6d6d6] text-[11px] leading-[1.4]">
+          <div className="space-y-2.5 border-b border-[var(--dividers)] pb-8 text-[12px] leading-[1.6]">
             {SITE_CONTENT.footer.notes.map((note, idx) => (
               <p key={idx}>{note}</p>
             ))}
           </div>
 
-          {/* Directory Links Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-b border-[#d6d6d6]">
-            {SITE_CONTENT.footer.directory.map((col, idx) => (
-              <div key={idx}>
-                <h4 className="text-[12px] font-semibold text-[#1d1d1f] mb-3">
+          {/* Directory Columns */}
+          <div className="grid grid-cols-2 gap-8 border-b border-[var(--dividers)] py-10 md:grid-cols-4">
+            {SITE_CONTENT.footer.directory.map((col) => (
+              <div key={col.title}>
+                <h4 className="mb-3.5 text-[13px] font-semibold text-[var(--ink)]">
                   {col.title}
                 </h4>
                 <ul className="space-y-2.5">
-                  {col.links.map((link, lIdx) => (
-                    <li key={lIdx}>
-                      <a href={link.href} className="text-[#707070] hover:text-[#1d1d1f] hover:underline">
+                  {col.links.map((link) => (
+                    <li key={`${col.title}-${link.label}`}>
+                      <a
+                        className="text-[13px] text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)] hover:underline hover:underline-offset-4"
+                        href={link.href}
+                      >
                         {link.label}
                       </a>
                     </li>
@@ -802,35 +811,45 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Copyright, Legal & Theme Toggle (in footer) */}
-          <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span>{SITE_CONTENT.footer.legal.copyright}</span>
-              {SITE_CONTENT.footer.legal.links.map((item, idx) => (
+          {/* Bottom Legal Bar & Appearance Toggle */}
+          <div className="flex flex-col items-start justify-between gap-5 pt-7 text-[12px] md:flex-row md:items-center">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <span className="font-medium text-[var(--ink-muted)]">
+                {SITE_CONTENT.footer.legal.copyright}
+              </span>
+              {SITE_CONTENT.footer.legal.links.map((item) => (
                 <a
-                  key={idx}
+                  className="text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)] hover:underline"
                   href={item.href}
-                  className="hover:text-[#1d1d1f] hover:underline"
+                  key={item.label}
                 >
                   {item.label}
                 </a>
               ))}
             </div>
 
-            {/* Theme Toggle placed in Footer */}
             <div className="flex items-center gap-3">
-              <span className="text-[11px] text-[#707070]">Appearance:</span>
+              <span className="text-[12px] font-medium text-[var(--text-secondary)]">
+                Appearance
+              </span>
               <ThemeToggle
-                variant="sun-moon"
-                size="sm"
-                theme={theme}
                 onThemeChange={handleThemeChange}
                 showSystem={false}
+                size="sm"
+                theme={theme}
+                variant="sun-moon"
               />
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Interactive Live Demo Modal */}
+      <DemoModal
+        initialPlan={selectedPlan}
+        isOpen={demoModalOpen}
+        onClose={() => setDemoModalOpen(false)}
+      />
     </div>
   );
 }
