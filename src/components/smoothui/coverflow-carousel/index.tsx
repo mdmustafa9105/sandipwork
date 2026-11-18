@@ -207,7 +207,7 @@ const CoverflowCarousel = ({
     >
       <motion.div
         className={cn(
-          "relative mx-auto flex h-[340px] sm:h-[360px] max-w-full items-center justify-center overflow-hidden",
+          "relative mx-auto flex h-[400px] sm:h-[380px] max-w-full items-center justify-center overflow-hidden",
           stageClassName
         )}
         drag={total > 1 && !shouldReduceMotion ? "x" : false}
@@ -248,7 +248,7 @@ const CoverflowCarousel = ({
               }
               aria-hidden={!isActive}
               className={cn(
-                "absolute w-[calc(100vw-40px)] max-w-[480px] sm:w-[460px] md:w-[520px] h-[296px] sm:h-[308px] overflow-hidden rounded-[28px]",
+                "absolute w-[calc(100vw-36px)] max-w-[540px] sm:w-[520px] md:w-[580px] h-[364px] sm:h-[340px] overflow-hidden rounded-[14px]",
                 !isActive && "cursor-pointer",
                 cardClassName
               )}

@@ -227,40 +227,176 @@ export default function Home() {
 
   const carouselItems: CoverflowCarouselItem[] = useMemo(
     () =>
-      SITE_CONTENT.stories.map((story) => ({
-        id: story.id,
-        content: (
-          <article className="flex h-full w-full flex-col justify-between rounded-[28px] border border-[var(--dividers)] bg-[var(--surface)] p-6 text-left sm:p-8">
-            <div>
-              <div className="mb-4 flex items-center justify-between gap-2">
-                <span className="inline-flex items-center rounded-full border border-[var(--hairline)] bg-[var(--pill-blue-soft)] px-3 py-1 text-[12px] font-semibold tabular-nums text-[var(--link)]">
-                  {story.metric}
-                </span>
-                <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                  {story.company}
-                </span>
-              </div>
-              <blockquote className="text-[17px] font-normal leading-[1.5] tracking-[-0.015em] text-[var(--ink)] sm:text-[19px]">
-                &ldquo;{story.quote}&rdquo;
-              </blockquote>
-            </div>
+      SITE_CONTENT.stories.map((story, idx) => {
+        const indexLabel = String(idx + 1).padStart(2, "0");
+        const metricParts = story.metric.split(" ");
+        const metricValue = metricParts[0];
+        const metricRest = metricParts.slice(1).join(" ");
 
-            <div className="mt-5 flex items-center justify-between border-t border-[var(--hairline)] pt-4">
-              <div>
-                <p className="text-[14px] font-semibold text-[var(--ink)]">
-                  {story.author}
-                </p>
-                <p className="text-[12px] text-[var(--text-secondary)]">
-                  {story.role} · {story.company}
-                </p>
+        // Story 01: Editorial Split-Column Folio (Left oversized metric rail, right pull-quote)
+        if (idx === 0) {
+          return {
+            id: story.id,
+            content: (
+              <article className="grid h-full w-full grid-cols-1 border border-[var(--dividers)] bg-[var(--surface)] text-left sm:grid-cols-12">
+                <div className="flex flex-row items-baseline justify-between border-b border-[var(--hairline)] bg-[var(--surface-subtle)] p-5 sm:col-span-4 sm:flex-col sm:border-r sm:border-b-0 sm:p-6">
+                  <span className="font-mono text-[10.5px] font-semibold tracking-[0.1em] text-[var(--outlines)]">
+                    CASE {indexLabel} / 04
+                  </span>
+                  <div className="text-right sm:mt-auto sm:text-left">
+                    <p className="text-[36px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--ink)] sm:text-[44px]">
+                      {metricValue}
+                    </p>
+                    <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--link)]">
+                      {metricRest}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-between p-5 sm:col-span-8 sm:p-7">
+                  <div>
+                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)]">
+                      {story.company}
+                    </p>
+                    <blockquote className="mt-3 text-[16px] font-normal leading-[1.52] tracking-[-0.014em] text-[var(--ink)] sm:text-[18px]">
+                      &ldquo;{story.quote}&rdquo;
+                    </blockquote>
+                  </div>
+                  <footer className="mt-4 border-t border-[var(--hairline)] pt-3.5">
+                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
+                      {story.author}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-secondary)]">
+                      {story.role} · {story.company}
+                    </p>
+                  </footer>
+                </div>
+              </article>
+            ),
+          };
+        }
+
+        // Story 02: Dark Editorial Monograph Plate (High-contrast obsidian paper surface)
+        if (idx === 1) {
+          return {
+            id: story.id,
+            content: (
+              <article className="flex h-full w-full flex-col justify-between border border-[#2c2c30] bg-[#141416] p-6 text-left text-[#f5f5f7] dark:border-[#3a3a42] dark:bg-[#1c1c21] sm:p-8">
+                <header className="flex items-center justify-between border-b border-[#26262a] pb-3.5">
+                  <div>
+                    <p className="text-[13px] font-semibold text-white">
+                      {story.author}
+                    </p>
+                    <p className="text-[11.5px] text-[#98989d]">
+                      {story.role} · {story.company}
+                    </p>
+                  </div>
+                  <span className="font-mono text-[10.5px] tracking-[0.1em] text-[#6e6e73]">
+                    {indexLabel} / 04
+                  </span>
+                </header>
+
+                <blockquote className="my-4 text-[16.5px] font-normal leading-[1.52] tracking-[-0.015em] text-[#f5f5f7] sm:text-[19px]">
+                  &ldquo;{story.quote}&rdquo;
+                </blockquote>
+
+                <footer className="flex items-baseline justify-between border-t border-[#26262a] pt-4">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.09em] text-[#98989d]">
+                    VERIFIED OUTCOME
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[#2997ff] sm:text-[32px]">
+                      {metricValue}
+                    </span>
+                    <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-[#d2d2d7]">
+                      {metricRest}
+                    </span>
+                  </div>
+                </footer>
+              </article>
+            ),
+          };
+        }
+
+        // Story 03: Top-Rule Business Publication Excerpt (Heavy 3px ink top bar + asymmetric footer)
+        if (idx === 2) {
+          return {
+            id: story.id,
+            content: (
+              <article className="flex h-full w-full flex-col justify-between border border-[var(--dividers)] border-t-[3px] border-t-[var(--ink)] bg-[var(--surface)] p-6 text-left sm:p-8">
+                <div className="flex items-center justify-between font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
+                  <span>{story.company}</span>
+                  <span>EXCERPT {indexLabel}</span>
+                </div>
+
+                <blockquote className="my-4 text-[17px] font-medium leading-[1.48] tracking-[-0.018em] text-[var(--ink)] sm:text-[20px]">
+                  &ldquo;{story.quote}&rdquo;
+                </blockquote>
+
+                <footer className="grid grid-cols-12 items-end gap-3 border-t border-[var(--hairline)] pt-4">
+                  <div className="col-span-5">
+                    <p className="text-[30px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--link)] sm:text-[36px]">
+                      {metricValue}
+                    </p>
+                    <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
+                      {metricRest}
+                    </p>
+                  </div>
+                  <div className="col-span-7 text-right">
+                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
+                      {story.author}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-secondary)]">
+                      {story.role}
+                    </p>
+                  </div>
+                </footer>
+              </article>
+            ),
+          };
+        }
+
+        // Story 04: Asymmetric Indexed Gutter Plate
+        return {
+          id: story.id,
+          content: (
+            <article className="flex h-full w-full border border-[var(--dividers)] bg-[var(--surface)] text-left">
+              <div className="flex w-12 shrink-0 flex-col items-center justify-between border-r border-[var(--hairline)] bg-[var(--surface-subtle)] py-6">
+                <span className="font-mono text-[11px] font-semibold text-[var(--outlines)]">
+                  {indexLabel}
+                </span>
+                <span className="h-10 w-px bg-[var(--dividers)]" />
+                <span className="size-1.5 rounded-full bg-[var(--pill-blue)]" />
               </div>
-              <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--outlines)]">
-                Design Partner
-              </span>
-            </div>
-          </article>
-        ),
-      })),
+
+              <div className="flex flex-1 flex-col justify-between p-5 sm:p-7">
+                <blockquote className="text-[16px] font-normal leading-[1.52] tracking-[-0.014em] text-[var(--ink)] sm:text-[18.5px]">
+                  &ldquo;{story.quote}&rdquo;
+                </blockquote>
+
+                <footer className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-[var(--hairline)] pt-4">
+                  <div>
+                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
+                      {story.author}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-secondary)]">
+                      {story.role} · {story.company}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-mono text-[24px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--ink)]">
+                      {metricValue}
+                    </p>
+                    <p className="mt-1 font-mono text-[9.5px] font-semibold uppercase tracking-[0.06em] text-[var(--success)]">
+                      {metricRest}
+                    </p>
+                  </div>
+                </footer>
+              </div>
+            </article>
+          ),
+        };
+      }),
     []
   );
 
@@ -629,103 +765,213 @@ export default function Home() {
                 depth={130}
                 items={carouselItems}
                 loop={true}
-                rotation={18}
-                scaleStep={0.11}
-                spacing={370}
+                rotation={16}
+                scaleStep={0.1}
+                spacing={410}
               />
             </div>
           </div>
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            6. PRICING — Crisp Three-Tier Architecture
+            6. PRICING — Differentiated Three-Tier Commercial Comparison System
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
           id="pricing"
         >
           <div className="mx-auto max-w-[1080px]">
-            <div className="mb-14 text-center">
-              <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-                Simple Pricing
-              </p>
-              <h2 className="apple-feature-heading mb-3 text-[var(--ink)]">
-                Choose the plan that fits your growth.
-              </h2>
-              <p className="apple-body mx-auto max-w-[540px] text-[var(--text-secondary)]">
+            <div className="mb-14 flex flex-col justify-between gap-4 border-b border-[var(--dividers)] pb-8 md:flex-row md:items-end">
+              <div>
+                <p className="apple-kicker mb-2 text-[var(--text-secondary)]">
+                  Simple Pricing
+                </p>
+                <h2 className="apple-feature-heading text-[var(--ink)]">
+                  Choose the plan that fits your growth.
+                </h2>
+              </div>
+              <p className="apple-body max-w-[380px] text-[var(--text-secondary)] md:text-right">
                 All plans include autonomous meeting booking and bi-directional
                 CRM sync.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
-              {SITE_CONTENT.pricing.map((plan) => (
-                <div
-                  className={`flex flex-col justify-between rounded-[28px] p-7 transition-colors ${
-                    plan.recommended
-                      ? "border-2 border-[var(--pill-blue)] bg-[var(--surface)]"
-                      : "border border-[var(--dividers)] bg-[var(--surface-subtle)] hover:border-[var(--outlines)]"
-                  }`}
-                  key={plan.id}
-                >
-                  <div>
-                    <div className="mb-3 flex h-6 items-center justify-between">
-                      <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
-                        {plan.name}
-                      </h3>
-                      {plan.recommended && (
-                        <span className="rounded-full bg-[var(--pill-blue-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--link)]">
-                          Recommended
+            {(() => {
+              const growth = SITE_CONTENT.pricing[0];
+              const scale = SITE_CONTENT.pricing[1];
+              const enterprise = SITE_CONTENT.pricing[2];
+
+              return (
+                <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:items-stretch">
+                  {/* ── TIER 01: GROWTH — Compact, Precise Paper Entry Sheet ── */}
+                  <div className="flex flex-col justify-between rounded-[12px] border border-[var(--dividers)] bg-[var(--surface)] p-6 transition-colors hover:border-[var(--outlines)] lg:col-span-4 lg:my-3 lg:p-7">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--outlines)]">
+                        <span>TIER 01</span>
+                        <span>SCALING TEAMS</span>
+                      </div>
+
+                      <div className="mt-5">
+                        <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
+                          {growth.name}
+                        </h3>
+                        <p className="mt-1.5 text-[13.5px] leading-[1.52] text-[var(--text-secondary)]">
+                          {growth.description}
+                        </p>
+                      </div>
+
+                      <div className="my-6 flex items-baseline gap-1.5 border-y border-[var(--hairline)] py-4">
+                        <span className="text-[38px] font-semibold leading-none tracking-[-0.035em] tabular-nums text-[var(--ink)]">
+                          {growth.price}
                         </span>
-                      )}
+                        <span className="font-mono text-[13px] text-[var(--text-secondary)]">
+                          {growth.period}
+                        </span>
+                      </div>
+
+                      <ul className="divide-y divide-[var(--hairline)]">
+                        {growth.features.map((feature) => (
+                          <li
+                            className="flex items-start gap-2.5 py-2.5 text-[13.5px] leading-[1.45] text-[var(--ink)] first:pt-0"
+                            key={feature}
+                          >
+                            <Check className="mt-0.5 size-3.5 shrink-0 text-[var(--pill-blue)]" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
-                    <p className="min-h-[44px] text-[14px] leading-[1.5] text-[var(--text-secondary)]">
-                      {plan.description}
-                    </p>
-
-                    <div className="my-6 flex items-baseline gap-1.5">
-                      <span className="text-[42px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--ink)]">
-                        {plan.price}
-                      </span>
-                      {plan.period && (
-                        <span className="text-[15px] text-[var(--text-secondary)]">
-                          {plan.period}
-                        </span>
-                      )}
+                    <div className="mt-7 pt-2">
+                      <button
+                        className="apple-outline-pill-btn w-full py-3 text-[13px]"
+                        onClick={() =>
+                          openDemoModal(PLAN_LABEL_MAP[growth.id] ?? growth.name)
+                        }
+                        type="button"
+                      >
+                        {growth.ctaText}
+                      </button>
                     </div>
-
-                    <ul className="space-y-3 border-t border-[var(--hairline)] pt-6">
-                      {plan.features.map((feature) => (
-                        <li
-                          className="flex items-start gap-2.5 text-[14px] leading-[1.45] text-[var(--ink)]"
-                          key={feature}
-                        >
-                          <Check className="mt-0.5 size-4 shrink-0 text-[var(--pill-blue)]" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
 
-                  <div className="mt-8 pt-2">
-                    <button
-                      className={
-                        plan.recommended
-                          ? "apple-pill-btn w-full py-3 text-[13px]"
-                          : "apple-outline-pill-btn w-full py-3 text-[13px]"
-                      }
-                      onClick={() =>
-                        openDemoModal(PLAN_LABEL_MAP[plan.id] ?? plan.name)
-                      }
-                      type="button"
-                    >
-                      {plan.ctaText}
-                    </button>
+                  {/* ── TIER 02: SCALE — Authoritative Obsidian Commercial Centerpiece ── */}
+                  <div className="relative flex flex-col justify-between overflow-hidden rounded-[14px] border border-[#2c2c30] bg-[#141416] text-[#f5f5f7] lg:col-span-4">
+                    {/* Crisp 3px Precision Top Accent Rule */}
+                    <div aria-hidden="true" className="h-[3px] w-full bg-[#0071e3]" />
+
+                    <div className="flex flex-1 flex-col justify-between p-7 sm:p-8">
+                      <div>
+                        <div className="flex items-center justify-between border-b border-[#26262a] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em]">
+                          <span className="text-[#98989d]">TIER 02 · MOST SELECTED</span>
+                          <span className="font-semibold text-[#2997ff]">
+                            RECOMMENDED
+                          </span>
+                        </div>
+
+                        <div className="mt-5">
+                          <h3 className="text-[26px] font-semibold tracking-[-0.025em] text-white">
+                            {scale.name}
+                          </h3>
+                          <p className="mt-2 text-[14px] leading-[1.55] text-[#a1a1a6]">
+                            {scale.description}
+                          </p>
+                        </div>
+
+                        <div className="my-6 flex items-baseline gap-1.5 border-y border-[#26262a] py-5">
+                          <span className="text-[48px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-white">
+                            {scale.price}
+                          </span>
+                          <span className="font-mono text-[14px] text-[#98989d]">
+                            {scale.period}
+                          </span>
+                        </div>
+
+                        <ul className="space-y-3">
+                          {scale.features.map((feature) => (
+                            <li
+                              className="flex items-start gap-2.5 text-[14px] leading-[1.48] text-[#e5e5ea]"
+                              key={feature}
+                            >
+                              <Check className="mt-0.5 size-4 shrink-0 text-[#2997ff]" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="mt-8 pt-3">
+                        <button
+                          className="apple-pill-btn w-full py-3.5 text-[13.5px]"
+                          onClick={() =>
+                            openDemoModal(PLAN_LABEL_MAP[scale.id] ?? scale.name)
+                          }
+                          type="button"
+                        >
+                          {scale.ctaText}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── TIER 03: ENTERPRISE — Consultative Tailored Dossier ── */}
+                  <div className="flex flex-col justify-between rounded-[12px] border border-[var(--dividers)] bg-[var(--alt-band)] p-6 transition-colors hover:border-[var(--outlines)] lg:col-span-4 lg:my-3 lg:p-7">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-dashed border-[var(--dividers)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
+                        <span>TIER 03</span>
+                        <span>BESPOKE DEPLOYMENT</span>
+                      </div>
+
+                      <div className="mt-5">
+                        <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
+                          {enterprise.name}
+                        </h3>
+                        <p className="mt-1.5 text-[13.5px] leading-[1.52] text-[var(--text-secondary)]">
+                          {enterprise.description}
+                        </p>
+                      </div>
+
+                      <div className="my-6 flex items-baseline justify-between border-y border-dashed border-[var(--dividers)] py-4">
+                        <span className="text-[36px] font-semibold leading-none tracking-[-0.03em] text-[var(--ink)]">
+                          {enterprise.price}
+                        </span>
+                        <span className="font-mono text-[10.5px] uppercase tracking-[0.07em] text-[var(--link)]">
+                          ANNUAL CONTRACT
+                        </span>
+                      </div>
+
+                      <ul className="space-y-3">
+                        {enterprise.features.map((feature, fIdx) => (
+                          <li
+                            className="flex items-start gap-2.5 text-[13.5px] leading-[1.45] text-[var(--ink)]"
+                            key={feature}
+                          >
+                            <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold text-[var(--outlines)]">
+                              {String(fIdx + 1).padStart(2, "0")}
+                            </span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mt-7 pt-2">
+                      <button
+                        className="apple-outline-pill-btn w-full py-3 text-[13px]"
+                        onClick={() =>
+                          openDemoModal(
+                            PLAN_LABEL_MAP[enterprise.id] ?? enterprise.name
+                          )
+                        }
+                        type="button"
+                      >
+                        {enterprise.ctaText}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </div>
         </section>
 
