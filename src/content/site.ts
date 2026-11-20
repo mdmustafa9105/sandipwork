@@ -1,3 +1,48 @@
+export interface CostComparisonDimension {
+  metric: string;
+  humanCoverage: {
+    value: string;
+    note: string;
+  };
+  orynvaiCoverage: {
+    value: string;
+    note: string;
+  };
+  operationalAdvantage: string;
+}
+
+export interface CostComparisonData {
+  kicker: string;
+  heading: string;
+  subheading: string;
+  configurationNotice: string;
+  summaryMetrics: Array<{
+    label: string;
+    humanValue: string;
+    orynvaiValue: string;
+    delta: string;
+    note: string;
+  }>;
+  dimensions: CostComparisonDimension[];
+}
+
+export interface HowItWorksFilmStage {
+  id: string;
+  step: string;
+  shortTitle: string;
+  headline: string;
+  description: string;
+  badge: string;
+}
+
+export interface HowItWorksSection {
+  kicker: string;
+  heading: string;
+  subheading: string;
+  actionLink: { label: string; href: string };
+  stages: HowItWorksFilmStage[];
+}
+
 export interface SiteContent {
   product: {
     name: string;
@@ -5,26 +50,15 @@ export interface SiteContent {
     headline: string;
     heroBody: string;
     heroLinks: Array<{ label: string; href: string }>;
-    pricingCallout: {
-      priceText: string;
-      ctaText: string;
-      ctaHref: string;
-    };
+    coverageBadge: string;
   };
   globalNav: {
     brand: string;
     links: Array<{ label: string; href: string }>;
+    ctaVapi: string;
+    ctaBooking: string;
   };
-  highlights: {
-    heading: string;
-    actionLink: { label: string; href: string };
-    cards: Array<{
-      id: string;
-      title: string;
-      kicker: string;
-      description: string;
-    }>;
-  };
+  howItWorks: HowItWorksSection;
   kineticBand: string[];
   editorialSections: Array<{
     id: string;
@@ -36,6 +70,7 @@ export interface SiteContent {
     align: "left" | "right";
     statsBadge?: string;
   }>;
+  costComparison: CostComparisonData;
   stories: Array<{
     id: string;
     company: string;
@@ -43,29 +78,27 @@ export interface SiteContent {
     author: string;
     role: string;
     metric: string;
-  }>;
-  pricing: Array<{
-    id: string;
-    name: string;
-    price: string;
-    period: string;
-    description: string;
-    recommended?: boolean;
-    features: string[];
-    ctaText: string;
+    video?: {
+      available: boolean;
+      videoUrl?: string;
+      posterUrl?: string;
+      duration?: string;
+    };
   }>;
   finalCta: {
     headline: string;
     body: string;
-    ctaText: string;
-    ctaHref: string;
+    ctaBooking: string;
+    ctaVapi: string;
   };
   footer: {
-    notes: string[];
-    directory: Array<{
-      title: string;
-      links: Array<{ label: string; href: string }>;
-    }>;
+    brand: string;
+    description: string;
+    essentialLinks: Array<{ label: string; href: string }>;
+    contactInfo?: {
+      email?: string;
+      note?: string;
+    };
     legal: {
       copyright: string;
       links: Array<{ label: string; href: string }>;
@@ -75,59 +108,74 @@ export interface SiteContent {
 
 export const SITE_CONTENT: SiteContent = {
   product: {
-    name: "SandipAI",
-    kicker: "AI sales agent",
-    headline: "The AI sales agent.\nBuilt to close.",
-    heroBody: "Autonomous multi-turn lead qualification, contextual objection handling, and instant calendar booking for high-growth revenue teams.",
+    name: "ORYNVAI",
+    kicker: "Autonomous Revenue Intelligence",
+    headline: "Convert your extra hours into revenue.\nClose inbound buyers around the clock.",
+    heroBody: "Traditional sales teams lose high-intent buyers during off-hours and delayed response windows. ORYNVAI engages enterprise prospects instantly, resolves technical objections, and books confirmed executive calls 24/7.",
     heroLinks: [
-      { label: "Watch how it works", href: "#how-it-works" },
-      { label: "Explore features", href: "#features" },
+      { label: "See how it works", href: "#how-it-works" },
+      { label: "Compare coverage", href: "#comparison" },
     ],
-    pricingCallout: {
-      priceText: "From $1,490/mo or $125/seat",
-      ctaText: "Get a demo",
-      ctaHref: "#pricing",
-    },
+    coverageBadge: "24/7 Continuous Inbound Sales Coverage",
   },
   globalNav: {
-    brand: "SandipAI",
+    brand: "ORYNVAI",
     links: [
-      { label: "Features", href: "#features" },
       { label: "How it works", href: "#how-it-works" },
-      { label: "Customers", href: "#customers" },
-      { label: "Pricing", href: "#pricing" },
+      { label: "Cost comparison", href: "#comparison" },
+      { label: "Customer proof", href: "#customers" },
     ],
+    ctaVapi: "Talk to ORYNVAI",
+    ctaBooking: "Book a sales call",
   },
-  highlights: {
-    heading: "Get the highlights.",
+  howItWorks: {
+    kicker: "CONTINUOUS PRODUCT FILM",
+    heading: "From first contact to a real opportunity.",
+    subheading: "Watch how ORYNVAI turns an incoming inquiry into a confirmed meeting and updates your business systems in seconds.",
     actionLink: {
-      label: "Explore capabilities",
-      href: "#features",
+      label: "Compare economic coverage",
+      href: "#comparison",
     },
-    cards: [
+    stages: [
       {
-        id: "chat-card",
-        kicker: "Autonomous Conversation",
-        title: "Discovers genuine buyer needs. Multi-turn. Real time.",
-        description: "Engages visitors naturally, learns their stack, resolves technical questions, and steers toward booking.",
+        id: "lead-arrives",
+        step: "01",
+        shortTitle: "Lead Arrives",
+        headline: "A potential buyer reaches out.",
+        description: "Inquiry arrives at 10:42 PM on a weekend. System acknowledges intent immediately.",
+        badge: "Inbound Trigger",
       },
       {
-        id: "reasoning-card",
-        kicker: "Transparent Reasoning",
-        title: "Knows why it answers before sending a single word.",
-        description: "Auditable chain-of-thought traces inspect intent, check product boundaries, and evaluate pricing fit.",
+        id: "ai-responds",
+        step: "02",
+        shortTitle: "ORYNVAI Responds",
+        headline: "Engages in natural dialogue.",
+        description: "Answers technical questions, resolves compliance inquiries, and keeps the buyer engaged.",
+        badge: "Sub-30s Dialogue",
       },
       {
-        id: "tool-card",
-        kicker: "Live Tool Execution",
-        title: "Checks rep availability and books the meeting on the spot.",
-        description: "Direct Calendar and CRM API queries reserve slots and generate custom invites in milliseconds.",
+        id: "opportunity-clears",
+        step: "03",
+        shortTitle: "Intent Qualified",
+        headline: "The opportunity becomes clear.",
+        description: "Classifies enterprise intent and suggests meeting times tailored to representative availability.",
+        badge: "Qualified Lead",
       },
       {
-        id: "task-card",
-        kicker: "Pipeline Autopilot",
-        title: "Executes every step from lead scoring to CRM logging.",
-        description: "Enriches company data, updates opportunity records, and briefs account executives automatically.",
+        id: "calendar-booking",
+        step: "04",
+        shortTitle: "3D Calendar",
+        headline: "Tactile meeting confirmation.",
+        description: "Calendar pages turn, date highlights, and a confirmed executive meeting is locked on the schedule.",
+        badge: "Calendar Locked",
+      },
+      {
+        id: "connected-systems",
+        step: "05",
+        shortTitle: "Connected Systems",
+        headline: "Dispatches to your stack.",
+        description: "Instant data movement into Salesforce, HubSpot, Slack, and Google Workspace.",
+        badge: "Ecosystem Synced",
       },
     ],
   },
@@ -148,9 +196,9 @@ export const SITE_CONTENT: SiteContent = {
   editorialSections: [
     {
       id: "conversations",
-      kicker: "Conversational Intelligence",
-      heading: "Talks like your top 1% AE. Reasons like your CRM.",
-      body: "SandipAI handles complex enterprise sales cycles with nuanced product knowledge. It navigates technical compliance, security reviews, and pricing discussions with fluid human-level empathy.",
+      kicker: "SMART CONVERSATIONS",
+      heading: "Answers questions like your best rep. Instantly.",
+      body: "Handles enterprise technical questions, compliance boundaries, and pricing discussions with verified accuracy.",
       linkText: "Learn about conversational safety",
       linkHref: "#how-it-works",
       align: "right",
@@ -158,9 +206,9 @@ export const SITE_CONTENT: SiteContent = {
     },
     {
       id: "pipeline",
-      kicker: "Pipeline Velocity",
-      heading: "From first inquiry to confirmed calendar invite in under 30 seconds.",
-      body: "When high-intent buyers arrive on your site, traditional lead forms lose 70% of prospects. SandipAI captures their peak motivation instantly, answering technical doubts and reserving executive meeting slots before they navigate away.",
+      kicker: "SPEED TO LEAD",
+      heading: "From first contact to confirmed meeting in 30 seconds.",
+      body: "Engages high-intent buyers the moment they land, preventing lead decay and lost opportunities.",
       linkText: "See response time benchmarks",
       linkHref: "#customers",
       align: "left",
@@ -168,23 +216,141 @@ export const SITE_CONTENT: SiteContent = {
     },
     {
       id: "integrations",
-      kicker: "Ecosystem Sync",
-      heading: "Plugs directly into your CRM. Zero manual logging.",
-      body: "Full bi-directional synchronization with Salesforce, HubSpot, Slack, and Google Workspace ensures every lead record, transcript note, and qualification metric is logged cleanly without rep intervention.",
+      kicker: "CONNECTED SYSTEMS",
+      heading: "Syncs directly with your core sales stack.",
+      body: "Live bi-directional synchronization with Salesforce, HubSpot, Slack, and Google Workspace without manual entry.",
       linkText: "Explore supported integrations",
-      linkHref: "#pricing",
+      linkHref: "#how-it-works",
       align: "right",
       statsBadge: "100% automated logging",
     },
   ],
+  costComparison: {
+    kicker: "FINANCIAL & OPERATIONAL VALUE",
+    heading: "Human sales capacity vs. continuous AI.",
+    subheading: "A visual comparison of operating coverage, speed to lead, and organizational overhead.",
+    configurationNotice: "Client Configuration Field: Industry benchmark baseline shown. Final enterprise unit economics will be calibrated to your exact compensation model and inbound lead volume.",
+    summaryMetrics: [
+      {
+        label: "Weekly Active Coverage",
+        humanValue: "40 hrs / wk",
+        orynvaiValue: "168 hrs / wk",
+        delta: "4.2x coverage",
+        note: "Zero coverage drop during nights, weekends, and holidays.",
+      },
+      {
+        label: "Speed to Lead Response",
+        humanValue: "42 min – 4 hrs",
+        orynvaiValue: "< 30 seconds",
+        delta: "Instantaneous",
+        note: "Captures prospect intent at peak buying momentum.",
+      },
+      {
+        label: "Annual Cost per Rep Equiv.",
+        humanValue: "$95k – $130k+",
+        orynvaiValue: "Operational fraction",
+        delta: "Significant OPEX savings",
+        note: "Zero recruiter fees, healthcare, payroll tax, or ramp downtime.",
+      },
+    ],
+    dimensions: [
+      {
+        metric: "Base & Target Compensation",
+        humanCoverage: {
+          value: "$65,000 – $85,000",
+          note: "Base salary before OTE incentives",
+        },
+        orynvaiCoverage: {
+          value: "Service investment",
+          note: "Predictable software & operational usage",
+        },
+        operationalAdvantage: "Direct overhead reduction",
+      },
+      {
+        metric: "Benefits, Taxes & Tooling",
+        humanCoverage: {
+          value: "+20% to 25%",
+          note: "Healthcare, payroll taxes, seat licenses",
+        },
+        orynvaiCoverage: {
+          value: "$0 payroll overhead",
+          note: "All infrastructure included",
+        },
+        operationalAdvantage: "Zero ancillary costs",
+      },
+      {
+        metric: "Recruitment & Placement",
+        humanCoverage: {
+          value: "$8,000 – $15,000",
+          note: "Agency fees or internal sourcing costs",
+        },
+        orynvaiCoverage: {
+          value: "$0 placement fee",
+          note: "Immediate deployment",
+        },
+        operationalAdvantage: "Eliminates recruiting lag",
+      },
+      {
+        metric: "Ramp & Onboarding Time",
+        humanCoverage: {
+          value: "3 to 4 months",
+          note: "Time to full product fluency & quota",
+        },
+        orynvaiCoverage: {
+          value: "< 1 hour setup",
+          note: "Pre-trained on your collateral & CRM rules",
+        },
+        operationalAdvantage: "Instant pipeline contribution",
+      },
+      {
+        metric: "After-Hours & Weekend Leads",
+        humanCoverage: {
+          value: "Unattended (lost)",
+          note: "70% of inbound buyers decay within 1 hour",
+        },
+        orynvaiCoverage: {
+          value: "100% engaged live",
+          note: "Immediate technical qualification & booking",
+        },
+        operationalAdvantage: "Monetizes off-hours traffic",
+      },
+      {
+        metric: "Concurrent Lead Capacity",
+        humanCoverage: {
+          value: "1 conversation at a time",
+          note: "Spike traffic results in dropped leads",
+        },
+        orynvaiCoverage: {
+          value: "Unlimited concurrent",
+          note: "Scales elastically with zero queuing",
+        },
+        operationalAdvantage: "Zero queue bottlenecks",
+      },
+      {
+        metric: "Tenure & Knowledge Retention",
+        humanCoverage: {
+          value: "14 – 18 month tenure",
+          note: "Knowledge lost upon rep departure",
+        },
+        orynvaiCoverage: {
+          value: "Permanent enterprise asset",
+          note: "Continuous learning and versioned playbooks",
+        },
+        operationalAdvantage: "Retains institutional memory",
+      },
+    ],
+  },
   stories: [
     {
       id: "story-1",
       company: "Apex Cloud",
-      quote: "SandipAI qualified and scheduled $420k in pipeline during our very first weekend. It completely eliminated our Monday morning backlog.",
+      quote: "ORYNVAI qualified and scheduled $420k in pipeline during our very first weekend. It completely eliminated our Monday morning backlog.",
       author: "Marcus Vance",
       role: "VP of Global Sales",
       metric: "+142% Inbound Meetings",
+      video: {
+        available: false,
+      },
     },
     {
       id: "story-2",
@@ -193,6 +359,9 @@ export const SITE_CONTENT: SiteContent = {
       author: "Elena Rostova",
       role: "Head of Revenue Operations",
       metric: "18s Median Response",
+      video: {
+        available: false,
+      },
     },
     {
       id: "story-3",
@@ -201,6 +370,9 @@ export const SITE_CONTENT: SiteContent = {
       author: "David Chen",
       role: "Chief Revenue Officer",
       metric: "3.2x Pipeline Velocity",
+      video: {
+        available: false,
+      },
     },
     {
       id: "story-4",
@@ -209,117 +381,34 @@ export const SITE_CONTENT: SiteContent = {
       author: "Sophia Lindqvist",
       role: "Director of Demand Gen",
       metric: "99.4% CSAT Rating",
-    },
-  ],
-  pricing: [
-    {
-      id: "plan-growth",
-      name: "Growth",
-      price: "$1,490",
-      period: "/ mo",
-      description: "For scaling revenue teams seeking 24/7 lead capture and automatic qualification.",
-      features: [
-        "Up to 2,500 autonomous sales conversations / mo",
-        "Autonomous meeting scheduling & qualification",
-        "Bi-directional HubSpot & Google Calendar sync",
-        "Custom playbook & tone alignment",
-        "Standard analytics and velocity dashboards",
-      ],
-      ctaText: "Choose Growth",
-    },
-    {
-      id: "plan-scale",
-      name: "Scale",
-      price: "$3,490",
-      period: "/ mo",
-      recommended: true,
-      description: "For high-volume sales organizations requiring multi-channel coverage and deep CRM automation.",
-      features: [
-        "Up to 10,000 autonomous sales conversations / mo",
-        "Omnichannel: Web Chat, Email, and SMS coverage",
-        "Bi-directional Salesforce & HubSpot Enterprise sync",
-        "Real-time reasoning logs & custom API tool actions",
-        "Custom LLM fine-tuning on your top winning calls",
-        "Dedicated Customer Success Manager",
-      ],
-      ctaText: "Get a demo",
-    },
-    {
-      id: "plan-enterprise",
-      name: "Enterprise",
-      price: "Custom",
-      period: "",
-      description: "For global enterprises demanding private VPC deployment, custom schemas, and SLA guarantees.",
-      features: [
-        "Unlimited autonomous conversations & custom seats",
-        "Private cloud deployment (AWS, GCP, or On-prem)",
-        "SOC 2 Type II & GDPR compliance guarantees",
-        "Custom CRM schema mapping & bespoke webhook actions",
-        "24/7 priority engineering support with 99.99% uptime",
-        "Custom security audit reviews & SSO / SCIM",
-      ],
-      ctaText: "Contact Enterprise",
+      video: {
+        available: false,
+      },
     },
   ],
   finalCta: {
-    headline: "Never lose a qualified buyer to slow replies again.",
-    body: "Deploy SandipAI into your website and CRM in under an hour. Watch your pipeline grow while you sleep.",
-    ctaText: "Get a demo",
-    ctaHref: "#pricing",
+    headline: "Convert your extra hours into revenue.",
+    body: "Deploy ORYNVAI across your inbound channels. Experience instantaneous lead response and continuous pipeline generation.",
+    ctaBooking: "Book a sales call",
+    ctaVapi: "Talk to ORYNVAI",
   },
   footer: {
-    notes: [
-      "1. Testing conducted with synthetic and live inbound prospect inquiries across SaaS lead workflows. Actual meeting conversion rates may vary depending on inbound traffic quality and offer structure.",
-      "2. CRM sync speeds are based on standard API throughput limits for Salesforce Enterprise and HubSpot Pro tiers.",
-      "3. All customer metrics reported by verified SandipAI early access design partners.",
+    brand: "ORYNVAI",
+    description: "Autonomous revenue intelligence converting inbound interest into qualified sales pipeline 24/7.",
+    essentialLinks: [
+      { label: "How it works", href: "#how-it-works" },
+      { label: "Cost comparison", href: "#comparison" },
+      { label: "Customer proof", href: "#customers" },
     ],
-    directory: [
-      {
-        title: "Product",
-        links: [
-          { label: "Conversational Agent", href: "#conversations" },
-          { label: "Pipeline Intelligence", href: "#pipeline" },
-          { label: "CRM Integrations", href: "#integrations" },
-          { label: "Reasoning Trace", href: "#how-it-works" },
-          { label: "Security & Compliance", href: "#conversations" },
-        ],
-      },
-      {
-        title: "Solutions",
-        links: [
-          { label: "Inbound Lead Qualification", href: "#features" },
-          { label: "24/7 Meeting Booking", href: "#pipeline" },
-          { label: "Enterprise Sales", href: "#pricing" },
-          { label: "High-Growth Startups", href: "#pricing" },
-        ],
-      },
-      {
-        title: "Resources",
-        links: [
-          { label: "How It Works", href: "#how-it-works" },
-          { label: "Capabilities", href: "#features" },
-          { label: "Customer Stories", href: "#customers" },
-          { label: "Pricing Plans", href: "#pricing" },
-        ],
-      },
-      {
-        title: "Company",
-        links: [
-          { label: "About SandipAI", href: "#hero" },
-          { label: "Request a Demo", href: "#cta" },
-          { label: "Privacy Policy", href: "#footer" },
-          { label: "Terms of Service", href: "#footer" },
-        ],
-      },
-    ],
+    contactInfo: {
+      note: "Enterprise consultations and custom deployments available worldwide.",
+    },
     legal: {
-      copyright: "Copyright © 2026 SandipAI Inc. All rights reserved.",
+      copyright: "Copyright © 2026 ORYNVAI Inc. All rights reserved.",
       links: [
-        { label: "Privacy Policy", href: "#footer" },
-        { label: "Terms of Use", href: "#footer" },
-        { label: "Sales Policy", href: "#footer" },
-        { label: "Legal", href: "#footer" },
-        { label: "Site Map", href: "#hero" },
+        { label: "Privacy Policy", href: "#" },
+        { label: "Terms of Service", href: "#" },
+        { label: "Security & Compliance", href: "#how-it-works" },
       ],
     },
   },

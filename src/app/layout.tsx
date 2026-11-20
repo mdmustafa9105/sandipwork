@@ -15,10 +15,22 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'SandipAI — The Autonomous AI Sales Agent',
-  description: 'SandipAI is an autonomous AI sales agent that qualifies inbound leads, resolves technical objections, and books high-value meetings 24/7.',
+  title: 'ORYNVAI — The Autonomous AI Sales Agent',
+  description: 'Convert your extra hours into revenue. ORYNVAI is an autonomous AI sales agent that qualifies enterprise inbound inquiries, handles objections, and books confirmed executive meetings 24/7.',
+  openGraph: {
+    title: 'ORYNVAI — The Autonomous AI Sales Agent',
+    description: 'Convert your extra hours into revenue with 24/7 autonomous sales coverage.',
+    siteName: 'ORYNVAI',
+    type: 'website',
+  },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 }
 

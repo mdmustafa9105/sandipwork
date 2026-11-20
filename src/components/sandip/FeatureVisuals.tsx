@@ -29,7 +29,7 @@ const OBJECTION_SCENARIOS = [
     prospect:
       "Our InfoSec team requires SOC 2 Type II and strict GDPR data boundaries before any pilot.",
     reply:
-      "SandipAI is SOC 2 Type II certified with full GDPR compliance and optional private VPC deployment on AWS, GCP, or on-prem. I can share our security review packet and include our Solutions Architect on Thursday's call.",
+      "ORYNVAI is SOC 2 Type II certified with full GDPR compliance and optional private VPC deployment on AWS, GCP, or on-prem. I can share our security review packet and include our Solutions Architect on Thursday's call.",
     intent: "Compliance Review",
     boundary: "Verified · Policy Safe",
     nextAction: "Attach Security Pack",
@@ -41,7 +41,7 @@ const OBJECTION_SCENARIOS = [
     prospect:
       "We handle roughly 6,000 inbound threads monthly across web and email. Which tier fits?",
     reply:
-      "Scale covers up to 10,000 autonomous conversations per month across Web Chat, Email, and SMS at $3,490/mo — including Salesforce Enterprise sync and custom LLM fine-tuning on your winning calls.",
+      "ORYNVAI covers 6,000+ monthly inbound threads across Web Chat, Email, and SMS with Salesforce Enterprise sync and custom model fine-tuning on your winning calls. I can schedule a consultation to size your custom deployment.",
     intent: "Commercial Sizing",
     boundary: "Approved Rate Card",
     nextAction: "Route to Scale AE",
@@ -169,10 +169,10 @@ export function ConversationalIntelligenceVisual({
                 </p>
               </div>
 
-              {/* Calibrated SandipAI Response (left architectural rule, no chat bubble) */}
+              {/* Calibrated ORYNVAI Response (left architectural rule, no chat bubble) */}
               <div className="border-l-2 border-[var(--pill-blue)] pl-4">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--link)]">
-                  SANDIPAI VERIFIED RESPONSE
+                  ORYNVAI VERIFIED RESPONSE
                 </p>
                 <p className="mt-1.5 text-[14px] leading-[1.6] text-[var(--ink-muted)]">
                   {active.reply}
@@ -507,7 +507,7 @@ export function EcosystemSyncVisual({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--dividers)] bg-[var(--alt-band)] px-5 py-3">
         <div className="flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
           <ArrowLeftRight className="size-3.5 text-[var(--link)]" />
-          <span>SANDIPAI CORE ⇄ 4 ENDPOINTS</span>
+          <span>ORYNVAI CORE ⇄ 4 ENDPOINTS</span>
         </div>
         {statsBadge && (
           <span className="font-mono text-[11px] font-semibold text-[var(--success)]">

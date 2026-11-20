@@ -1,37 +1,29 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import PagePreloader from "@/components/smoothui/page-preloader";
 import ThemeToggle from "@/components/smoothui/theme-toggle";
 import AIOrbFace from "@/components/smoothui/ai-orb-face";
-import type { CoverflowCarouselItem } from "@/components/smoothui/coverflow-carousel";
-import LearnMoreLink from "@/components/sandip/LearnMoreLink";
-import ProductHighlightsStage from "@/components/sandip/ProductHighlightsStage";
+import LearnMoreLink from "@/components/orynvai/LearnMoreLink";
+import ContinuousProductFilm from "@/components/orynvai/ContinuousProductFilm";
+import VisualCostComparison from "@/components/orynvai/VisualCostComparison";
 import {
   ConversationalIntelligenceVisual,
   EcosystemSyncVisual,
   PipelineVelocityVisual,
-} from "@/components/sandip/FeatureVisuals";
-import DemoModal from "@/components/sandip/DemoModal";
+} from "@/components/orynvai/FeatureVisuals";
+import BookingModal from "@/components/orynvai/BookingModal";
+import VapiVoiceModal from "@/components/orynvai/VapiVoiceModal";
 import { SITE_CONTENT } from "@/content/site";
-import { Check, Menu, X } from "lucide-react";
-
-const DynamicCoverflowCarousel = dynamic(
-  () => import("@/components/smoothui/coverflow-carousel"),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="mx-auto flex h-[340px] w-full max-w-[520px] items-center justify-center rounded-[28px] border border-[var(--hairline)] bg-[var(--surface)] text-sm text-[var(--text-secondary)]"
-      >
-        Loading customer stories…
-      </div>
-    ),
-  }
-);
+import {
+  Menu,
+  X,
+  Mic,
+  Calendar,
+} from "lucide-react";
 
 const DynamicKineticTypeScroll = dynamic(
   () => import("@/components/smoothui/kinetic-type-scroll"),
@@ -48,41 +40,39 @@ const DynamicKineticTypeScroll = dynamic(
   }
 );
 
-const PLAN_LABEL_MAP: Record<string, string> = {
-  "plan-growth": "Growth ($1,490/mo)",
-  "plan-scale": "Scale ($3,490/mo)",
-  "plan-enterprise": "Enterprise (Custom)",
-};
-
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
   const [showPreloader, setShowPreloader] = useState(false);
   const [heroReady, setHeroReady] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [orbSize, setOrbSize] = useState(310);
-  const [demoModalOpen, setDemoModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("Scale ($3,490/mo)");
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [vapiModalOpen, setVapiModalOpen] = useState(false);
   const heroRef = useRef<HTMLElement | null>(null);
 
-  const openDemoModal = useCallback((planName = "Scale ($3,490/mo)") => {
-    setSelectedPlan(planName);
-    setDemoModalOpen(true);
+  const openBookingModal = useCallback(() => {
+    setBookingModalOpen(true);
+    setNavOpen(false);
+  }, []);
+
+  const openVapiModal = useCallback(() => {
+    setVapiModalOpen(true);
     setNavOpen(false);
   }, []);
 
   // Initialize preloader, saved theme preference, and responsive orb sizing
   useEffect(() => {
     const rafId = requestAnimationFrame(() => {
-      const savedTheme = localStorage.getItem("sandipai_theme");
+      const savedTheme = localStorage.getItem("orynvai_theme") || localStorage.getItem("sandipai_theme");
       if (savedTheme === "dark" || savedTheme === "light") {
         setTheme(savedTheme);
         document.documentElement.classList.toggle("dark", savedTheme === "dark");
       }
 
-      const hasSeenPreloader = sessionStorage.getItem("sandipai_apple_preloader_seen");
+      const hasSeenPreloader = sessionStorage.getItem("orynvai_preloader_seen");
       if (!hasSeenPreloader) {
         setShowPreloader(true);
-        sessionStorage.setItem("sandipai_apple_preloader_seen", "true");
+        sessionStorage.setItem("orynvai_preloader_seen", "true");
       } else {
         setHeroReady(true);
       }
@@ -201,7 +191,7 @@ export default function Home() {
     const resolved = newTheme === "dark" ? "dark" : "light";
     setTheme(resolved);
     document.documentElement.classList.toggle("dark", resolved === "dark");
-    localStorage.setItem("sandipai_theme", resolved);
+    localStorage.setItem("orynvai_theme", resolved);
   };
 
   const orbColors = useMemo(
@@ -225,183 +215,8 @@ export default function Home() {
     []
   );
 
-  const carouselItems: CoverflowCarouselItem[] = useMemo(
-    () =>
-      SITE_CONTENT.stories.map((story, idx) => {
-        const indexLabel = String(idx + 1).padStart(2, "0");
-        const metricParts = story.metric.split(" ");
-        const metricValue = metricParts[0];
-        const metricRest = metricParts.slice(1).join(" ");
-
-        // Story 01: Editorial Split-Column Folio (Left oversized metric rail, right pull-quote)
-        if (idx === 0) {
-          return {
-            id: story.id,
-            content: (
-              <article className="grid h-full w-full grid-cols-1 border border-[var(--dividers)] bg-[var(--surface)] text-left sm:grid-cols-12">
-                <div className="flex flex-row items-baseline justify-between border-b border-[var(--hairline)] bg-[var(--surface-subtle)] px-5 py-3.5 sm:col-span-4 sm:flex-col sm:border-r sm:border-b-0 sm:p-6">
-                  <span className="font-mono text-[10.5px] font-semibold tracking-[0.1em] text-[var(--text-secondary)]">
-                    CASE {indexLabel} / 04
-                  </span>
-                  <div className="text-right sm:mt-auto sm:text-left">
-                    <p className="text-[36px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--ink)] sm:text-[44px]">
-                      {metricValue}
-                    </p>
-                    <p className="mt-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--link)]">
-                      {metricRest}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col justify-between p-5 sm:col-span-8 sm:p-7">
-                  <div>
-                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)]">
-                      {story.company}
-                    </p>
-                    <blockquote className="mt-3 text-[16px] font-normal leading-[1.52] tracking-[-0.014em] text-[var(--ink)] sm:text-[18px]">
-                      &ldquo;{story.quote}&rdquo;
-                    </blockquote>
-                  </div>
-                  <footer className="mt-4 border-t border-[var(--hairline)] pt-3.5">
-                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
-                      {story.author}
-                    </p>
-                    <p className="text-[12px] text-[var(--text-secondary)]">
-                      {story.role} · {story.company}
-                    </p>
-                  </footer>
-                </div>
-              </article>
-            ),
-          };
-        }
-
-        // Story 02: Dark Editorial Monograph Plate (High-contrast obsidian paper surface)
-        if (idx === 1) {
-          return {
-            id: story.id,
-            content: (
-              <article className="flex h-full w-full flex-col justify-between border border-[#2c2c30] bg-[#141416] p-6 text-left text-[#f5f5f7] dark:border-[#3a3a42] dark:bg-[#1c1c21] sm:p-8">
-                <header className="flex items-center justify-between border-b border-[#26262a] pb-3.5">
-                  <div>
-                    <p className="text-[13px] font-semibold text-white">
-                      {story.author}
-                    </p>
-                    <p className="text-[11.5px] text-[#98989d]">
-                      {story.role} · {story.company}
-                    </p>
-                  </div>
-                  <span className="font-mono text-[10.5px] tracking-[0.1em] text-[#a1a1a6]">
-                    {indexLabel} / 04
-                  </span>
-                </header>
-
-                <blockquote className="my-4 text-[16.5px] font-normal leading-[1.52] tracking-[-0.015em] text-[#f5f5f7] sm:text-[19px]">
-                  &ldquo;{story.quote}&rdquo;
-                </blockquote>
-
-                <footer className="flex items-baseline justify-between border-t border-[#26262a] pt-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.09em] text-[#98989d]">
-                    VERIFIED OUTCOME
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[#2997ff] sm:text-[32px]">
-                      {metricValue}
-                    </span>
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-[#d2d2d7]">
-                      {metricRest}
-                    </span>
-                  </div>
-                </footer>
-              </article>
-            ),
-          };
-        }
-
-        // Story 03: Top-Rule Business Publication Excerpt (Heavy 3px ink top bar + asymmetric footer)
-        if (idx === 2) {
-          return {
-            id: story.id,
-            content: (
-              <article className="flex h-full w-full flex-col justify-between border border-[var(--dividers)] border-t-[3px] border-t-[var(--ink)] bg-[var(--surface)] p-6 text-left sm:p-8">
-                <div className="flex items-center justify-between font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
-                  <span>{story.company}</span>
-                  <span>EXCERPT {indexLabel}</span>
-                </div>
-
-                <blockquote className="my-4 text-[17px] font-medium leading-[1.48] tracking-[-0.018em] text-[var(--ink)] sm:text-[20px]">
-                  &ldquo;{story.quote}&rdquo;
-                </blockquote>
-
-                <footer className="grid grid-cols-12 items-end gap-3 border-t border-[var(--hairline)] pt-4">
-                  <div className="col-span-5">
-                    <p className="text-[30px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-[var(--link)] sm:text-[36px]">
-                      {metricValue}
-                    </p>
-                    <p className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.06em] text-[var(--text-secondary)]">
-                      {metricRest}
-                    </p>
-                  </div>
-                  <div className="col-span-7 text-right">
-                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
-                      {story.author}
-                    </p>
-                    <p className="text-[12px] text-[var(--text-secondary)]">
-                      {story.role}
-                    </p>
-                  </div>
-                </footer>
-              </article>
-            ),
-          };
-        }
-
-        // Story 04: Asymmetric Indexed Gutter Plate
-        return {
-          id: story.id,
-          content: (
-            <article className="flex h-full w-full border border-[var(--dividers)] bg-[var(--surface)] text-left">
-              <div className="flex w-12 shrink-0 flex-col items-center justify-between border-r border-[var(--hairline)] bg-[var(--surface-subtle)] py-6">
-                <span className="font-mono text-[11px] font-semibold text-[var(--text-secondary)]">
-                  {indexLabel}
-                </span>
-                <span className="h-10 w-px bg-[var(--dividers)]" />
-                <span className="size-1.5 rounded-full bg-[var(--pill-blue)]" />
-              </div>
-
-              <div className="flex flex-1 flex-col justify-between p-5 sm:p-7">
-                <blockquote className="text-[16px] font-normal leading-[1.52] tracking-[-0.014em] text-[var(--ink)] sm:text-[18.5px]">
-                  &ldquo;{story.quote}&rdquo;
-                </blockquote>
-
-                <footer className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-[var(--hairline)] pt-4">
-                  <div>
-                    <p className="text-[13.5px] font-semibold text-[var(--ink)]">
-                      {story.author}
-                    </p>
-                    <p className="text-[12px] text-[var(--text-secondary)]">
-                      {story.role} · {story.company}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono text-[24px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--ink)]">
-                      {metricValue}
-                    </p>
-                    <p className="mt-1 font-mono text-[9.5px] font-semibold uppercase tracking-[0.06em] text-[var(--success)]">
-                      {metricRest}
-                    </p>
-                  </div>
-                </footer>
-              </div>
-            </article>
-          ),
-        };
-      }),
-    []
-  );
-
   return (
-    <div className="relative min-h-screen max-w-full overflow-x-clip bg-[var(--canvas)] text-[var(--ink)]">
+    <div className="bg-subtle-grain relative min-h-screen max-w-full overflow-x-clip bg-[var(--canvas)] text-[var(--ink)]">
       {/* Skip link for keyboard accessibility */}
       <a
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[110] focus:rounded-full focus:bg-[var(--pill-blue)] focus:px-4 focus:py-2 focus:text-xs focus:font-medium focus:text-white"
@@ -420,12 +235,12 @@ export default function Home() {
             setHeroReady(true);
           }}
           variant="words"
-          words={["Qualify.", "Convert.", "Close."]}
+          words={["Qualify.", "Convert.", "Revenue."]}
         />
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          1. STICKY GLOBAL NAVIGATION (44px, single authoritative bar)
+          1. STICKY GLOBAL NAVIGATION (48px authoritative bar, brand & CTAs + Theme in Top-Right)
           ═══════════════════════════════════════════════════════════════════════ */}
       <nav
         aria-label="Global"
@@ -433,16 +248,33 @@ export default function Home() {
       >
         <div className="mx-auto flex h-full max-w-[1080px] items-center justify-between px-4 sm:px-6">
           <a
-            className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em] text-[var(--ink)] transition-opacity hover:opacity-80"
+            className="flex items-center gap-2.5 text-[17px] font-bold tracking-[-0.03em] text-[var(--ink)] transition-opacity hover:opacity-85"
             href="#hero"
           >
-            <span
-              aria-hidden="true"
-              className="size-2 rounded-full bg-[var(--pill-blue)]"
-            />
-            {SITE_CONTENT.globalNav.brand}
+            <div className="relative size-6 shrink-0">
+              <Image
+                alt="ORYNVAI logo"
+                className="size-6 object-contain dark:hidden"
+                height={24}
+                priority
+                src="/orynvai-logo-black.png"
+                width={24}
+              />
+              <Image
+                alt="ORYNVAI logo"
+                className="hidden size-6 object-contain dark:block"
+                height={24}
+                priority
+                src="/orynvai-logo-white.png"
+                width={24}
+              />
+            </div>
+            <span className="font-semibold tracking-[0.02em]">
+              {SITE_CONTENT.globalNav.brand}
+            </span>
           </a>
 
+          {/* Desktop Nav Links */}
           <div className="hidden items-center gap-8 md:flex">
             {SITE_CONTENT.globalNav.links.map((link) => (
               <a
@@ -455,49 +287,77 @@ export default function Home() {
             ))}
           </div>
 
+          {/* Desktop Conversion Buttons + Far Top-Right Theme Toggle */}
           <div className="hidden items-center gap-3 md:flex">
             <button
-              className="apple-pill-btn py-1.5 text-[12px]"
-              onClick={() => openDemoModal()}
+              className="apple-outline-pill-btn flex items-center gap-1.5 py-1.5 text-[12px]"
+              onClick={openVapiModal}
               type="button"
             >
-              Get a demo
+              <Mic className="size-3 text-[var(--link)]" />
+              <span>{SITE_CONTENT.globalNav.ctaVapi}</span>
             </button>
-          </div>
-
-          <button
-            aria-controls="mobile-nav-menu"
-            aria-expanded={navOpen}
-            aria-label={navOpen ? "Close menu" : "Open menu"}
-            className="-mr-2 flex h-[44px] w-[44px] items-center justify-center text-[var(--ink)] transition-colors hover:text-[var(--link)] md:hidden"
-            onClick={() => setNavOpen(!navOpen)}
-            type="button"
-          >
-            <div className="relative flex size-6 items-center justify-center">
-              <Menu
-                className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
-                  navOpen
-                    ? "rotate-90 scale-75 opacity-0"
-                    : "rotate-0 scale-100 opacity-100"
-                }`}
-              />
-              <X
-                className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
-                  navOpen
-                    ? "rotate-0 scale-100 opacity-100"
-                    : "-rotate-90 scale-75 opacity-0"
-                }`}
+            <button
+              className="apple-pill-btn py-1.5 text-[12px]"
+              onClick={openBookingModal}
+              type="button"
+            >
+              {SITE_CONTENT.globalNav.ctaBooking}
+            </button>
+            <div className="ml-1 pl-2 border-l border-[var(--dividers)]">
+              <ThemeToggle
+                onThemeChange={handleThemeChange}
+                showSystem={false}
+                size="sm"
+                theme={theme}
+                variant="sun-moon"
               />
             </div>
-          </button>
+          </div>
+
+          {/* Mobile Far Top-Right Container: Theme Toggle + Menu Hamburger */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle
+              onThemeChange={handleThemeChange}
+              showSystem={false}
+              size="sm"
+              theme={theme}
+              variant="sun-moon"
+            />
+            <button
+              aria-controls="mobile-nav-menu"
+              aria-expanded={navOpen}
+              aria-label={navOpen ? "Close menu" : "Open menu"}
+              className="flex h-[44px] w-[44px] items-center justify-center text-[var(--ink)] transition-colors hover:text-[var(--link)]"
+              onClick={() => setNavOpen(!navOpen)}
+              type="button"
+            >
+              <div className="relative flex size-6 items-center justify-center">
+                <Menu
+                  className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
+                    navOpen
+                      ? "rotate-90 scale-75 opacity-0"
+                      : "rotate-0 scale-100 opacity-100"
+                  }`}
+                />
+                <X
+                  className={`absolute inset-0 size-6 transition-all duration-200 motion-reduce:transition-none ${
+                    navOpen
+                      ? "rotate-0 scale-100 opacity-100"
+                      : "-rotate-90 scale-75 opacity-0"
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
         </div>
 
-        {/* Mobile Sheet */}
+        {/* Mobile Sheet Menu */}
         {navOpen && (
           <>
             <div
               aria-hidden="true"
-              className="fixed inset-0 top-[48px] z-40 bg-black/15 md:hidden"
+              className="fixed inset-0 top-[48px] z-40 bg-black/20 backdrop-blur-sm md:hidden"
               onClick={() => setNavOpen(false)}
             />
             <div
@@ -522,13 +382,22 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="pt-1">
+                <div className="flex flex-col gap-2.5 pt-2">
                   <button
-                    className="apple-pill-btn h-[44px] w-full text-[14px]"
-                    onClick={() => openDemoModal()}
+                    className="apple-pill-btn flex h-[44px] w-full items-center justify-center gap-2 text-[14px]"
+                    onClick={openBookingModal}
                     type="button"
                   >
-                    Get a demo
+                    <Calendar className="size-4" />
+                    <span>{SITE_CONTENT.globalNav.ctaBooking}</span>
+                  </button>
+                  <button
+                    className="apple-outline-pill-btn flex h-[44px] w-full items-center justify-center gap-2 text-[14px]"
+                    onClick={openVapiModal}
+                    type="button"
+                  >
+                    <Mic className="size-4 text-[var(--link)]" />
+                    <span>{SITE_CONTENT.globalNav.ctaVapi}</span>
                   </button>
                 </div>
               </div>
@@ -539,17 +408,17 @@ export default function Home() {
 
       <main id="main-content">
         {/* ═════════════════════════════════════════════════════════════════════
-            2. HERO SECTION (Editorial typography + signature SandipAI optical orb)
+            2. OUTCOME-LED HERO SECTION (The customer is the hero)
             ═════════════════════════════════════════════════════════════════════ */}
         <section
-          className="relative overflow-hidden bg-[var(--canvas)] px-4 pt-12 pb-16 [contain:paint] sm:px-6 md:flex md:min-h-[min(calc(100svh-48px),780px)] md:items-center md:py-16 lg:px-8"
+          className="bg-micro-grid relative overflow-hidden px-4 pt-12 pb-16 [contain:paint] sm:px-6 md:flex md:min-h-[min(calc(100svh-48px),780px)] md:items-center md:py-16 lg:px-8"
           id="hero"
           ref={heroRef}
         >
           <div aria-hidden="true" className="hero-grid-lines" />
 
           <div className="relative z-10 mx-auto grid w-full max-w-[1080px] grid-cols-1 items-center gap-12 md:grid-cols-12 md:gap-8 lg:gap-12">
-            {/* Left Column: Composed Headline, Body & Actions */}
+            {/* Left Column: Composed Outcome Headline & Dual CTAs */}
             <div className="flex flex-col items-start text-left md:col-span-7">
               <p className="hero-kicker apple-kicker mb-4 text-[var(--text-secondary)]">
                 {SITE_CONTENT.product.kicker}
@@ -568,32 +437,46 @@ export default function Home() {
                 ))}
               </h1>
 
-              <p className="hero-body apple-body mb-8 max-w-[520px] text-left text-[var(--text-secondary)]">
+              <p className="hero-body apple-body mb-8 max-w-[540px] text-left text-[var(--text-secondary)]">
                 {SITE_CONTENT.product.heroBody}
               </p>
 
-              <div className="hero-actions flex flex-wrap items-center gap-x-6 gap-y-3">
+              {/* Dual Action Conversion Strip */}
+              <div className="hero-actions flex flex-wrap items-center gap-4">
                 <button
-                  className="apple-pill-btn px-6 py-3 text-[14px]"
-                  onClick={() => openDemoModal()}
+                  className="apple-pill-btn flex items-center gap-2 px-6 py-3.5 text-[14px]"
+                  onClick={openBookingModal}
                   type="button"
                 >
-                  {SITE_CONTENT.product.pricingCallout.ctaText}
+                  <Calendar className="size-4" />
+                  <span>{SITE_CONTENT.globalNav.ctaBooking}</span>
                 </button>
-                <LearnMoreLink href={SITE_CONTENT.product.heroLinks[0].href}>
-                  {SITE_CONTENT.product.heroLinks[0].label}
-                </LearnMoreLink>
+
+                <button
+                  className="apple-outline-pill-btn flex items-center gap-2 px-5 py-3.5 text-[14px]"
+                  onClick={openVapiModal}
+                  type="button"
+                >
+                  <Mic className="size-4 text-[var(--link)]" />
+                  <span>{SITE_CONTENT.globalNav.ctaVapi}</span>
+                </button>
+
+                <div className="mt-2 w-full sm:mt-0 sm:w-auto">
+                  <LearnMoreLink href={SITE_CONTENT.product.heroLinks[0].href}>
+                    {SITE_CONTENT.product.heroLinks[0].label}
+                  </LearnMoreLink>
+                </div>
               </div>
             </div>
 
-            {/* Right Column: SandipAI Optical Character & Pricing Capsule */}
+            {/* Right Column: Signature ORYNVAI Optical Character & Operational Capsule */}
             <div className="hero-orb-stage flex w-full max-w-full flex-col items-center justify-center md:col-span-5">
               <div
                 className="flex max-w-full items-center justify-center"
                 style={{ height: orbSize, width: orbSize }}
               >
                 <AIOrbFace
-                  aria-label="SandipAI autonomous sales agent visual signature"
+                  aria-label="ORYNVAI autonomous revenue agent visual signature"
                   colors={orbColors}
                   gaze={true}
                   interactive={true}
@@ -603,10 +486,11 @@ export default function Home() {
                 />
               </div>
 
-              <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-[var(--dividers)] bg-[var(--alt-band)] px-4 py-1.5 text-[12px] font-medium text-[var(--text-secondary)]">
-                <span className="size-1.5 rounded-full bg-[var(--success)]" />
-                <span className="tabular-nums">
-                  {SITE_CONTENT.product.pricingCallout.priceText}
+              {/* Coverage Indicator: Replaced pricing capsule with operational outcome */}
+              <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-[var(--dividers)] bg-[var(--surface)] px-4 py-1.5 text-[12px] font-medium text-[var(--text-secondary)] shadow-sm">
+                <span className="size-2 animate-pulse rounded-full bg-[var(--success)]" />
+                <span className="tabular-nums text-[var(--ink)]">
+                  {SITE_CONTENT.product.coverageBadge}
                 </span>
               </div>
             </div>
@@ -614,28 +498,31 @@ export default function Home() {
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            3. PRODUCT HIGHLIGHTS — Connected 4-Stage Interactive Sales Story
+            3. HOW IT WORKS — Continuous Interactive Product Film
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="scroll-mt-[56px] bg-[var(--alt-band)] px-4 py-[88px] sm:px-6 lg:py-[104px]"
           id="how-it-works"
         >
           <div className="mx-auto max-w-[1080px]">
-            <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div className="mb-10 flex flex-col justify-between gap-4 border-b border-[var(--dividers)] pb-8 sm:flex-row sm:items-end">
               <div>
+                <p className="apple-kicker mb-2 text-[var(--text-secondary)]">
+                  {SITE_CONTENT.howItWorks.kicker}
+                </p>
                 <h2 className="apple-feature-heading text-[var(--ink)]">
-                  {SITE_CONTENT.highlights.heading}
+                  {SITE_CONTENT.howItWorks.heading}
                 </h2>
                 <p className="mt-2 text-[16px] text-[var(--text-secondary)]">
-                  Follow one enterprise inquiry from first question to booked calendar invite.
+                  {SITE_CONTENT.howItWorks.subheading}
                 </p>
               </div>
-              <LearnMoreLink href={SITE_CONTENT.highlights.actionLink.href}>
-                {SITE_CONTENT.highlights.actionLink.label}
+              <LearnMoreLink href={SITE_CONTENT.howItWorks.actionLink.href}>
+                {SITE_CONTENT.howItWorks.actionLink.label}
               </LearnMoreLink>
             </div>
 
-            <ProductHighlightsStage />
+            <ContinuousProductFilm />
           </div>
         </section>
 
@@ -739,260 +626,122 @@ export default function Home() {
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            5. CUSTOMER IMPACT — Balanced Coverflow Carousel
+            5. HUMAN VS ORYNVAI COST COMPARISON (Visual 24/7 Dial & Economic Value)
             ═════════════════════════════════════════════════════════════════════ */}
         <section
-          className="scroll-mt-[56px] bg-[var(--alt-band)] px-4 py-[96px] text-center sm:px-6 lg:py-[112px]"
-          id="customers"
+          className="scroll-mt-[56px] border-t border-[var(--dividers)] bg-[var(--alt-band)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
+          id="comparison"
         >
-          <div className="mx-auto max-w-[1080px]">
-            <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-              Customer Impact
-            </p>
-            <h2 className="apple-feature-heading mb-4 text-[var(--ink)]">
-              Proven on modern sales floors.
-            </h2>
-            <p className="apple-body mx-auto mb-12 max-w-[540px] text-[var(--text-secondary)]">
-              Browse real-world qualification metrics from revenue teams scaling
-              pipeline volume.
-            </p>
-
-            <div className="w-full max-w-full overflow-hidden [touch-action:pan-y]">
-              <DynamicCoverflowCarousel
-                autoplay={true}
-                autoplayDelay={5500}
-                className="py-2"
-                depth={130}
-                items={carouselItems}
-                loop={true}
-                rotation={16}
-                scaleStep={0.1}
-                spacing={410}
-              />
-            </div>
-          </div>
+          <VisualCostComparison onOpenBookingModal={openBookingModal} />
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            6. PRICING — Differentiated Three-Tier Commercial Comparison System
+            6. CUSTOMER REVIEWS (Clean Non-Overlapping Responsive Grid)
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
-          id="pricing"
+          id="customers"
         >
           <div className="mx-auto max-w-[1080px]">
-            <div className="mb-14 flex flex-col justify-between gap-4 border-b border-[var(--dividers)] pb-8 md:flex-row md:items-end">
-              <div>
-                <p className="apple-kicker mb-2 text-[var(--text-secondary)]">
-                  Simple Pricing
-                </p>
-                <h2 className="apple-feature-heading text-[var(--ink)]">
-                  Choose the plan that fits your growth.
-                </h2>
-              </div>
-              <p className="apple-body max-w-[380px] text-[var(--text-secondary)] md:text-right">
-                All plans include autonomous meeting booking and bi-directional
-                CRM sync.
+            <div className="mb-12 text-center">
+              <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
+                Customer Proof
+              </p>
+              <h2 className="apple-feature-heading mb-4 text-[var(--ink)]">
+                Proven on modern revenue floors.
+              </h2>
+              <p className="apple-body mx-auto max-w-[540px] text-[var(--text-secondary)]">
+                Browse verified qualification metrics from revenue teams scaling inbound capacity.
               </p>
             </div>
 
-            {(() => {
-              const growth = SITE_CONTENT.pricing[0];
-              const scale = SITE_CONTENT.pricing[1];
-              const enterprise = SITE_CONTENT.pricing[2];
+            {/* Clean 2x2 Non-Overlapping Responsive Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {SITE_CONTENT.stories.map((story, idx) => {
+                const indexLabel = String(idx + 1).padStart(2, "0");
+                const metricParts = story.metric.split(" ");
+                const metricValue = metricParts[0];
+                const metricRest = metricParts.slice(1).join(" ");
 
-              return (
-                <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:items-stretch">
-                  {/* ── TIER 01: GROWTH — Compact, Precise Paper Entry Sheet ── */}
-                  <div className="flex flex-col justify-between rounded-[12px] border border-[var(--dividers)] bg-[var(--surface)] p-6 transition-colors hover:border-[var(--outlines)] lg:col-span-4 lg:my-3 lg:p-7">
+                return (
+                  <article
+                    className="flex flex-col justify-between rounded-[14px] border border-[var(--dividers)] bg-[var(--surface)] p-6 text-left shadow-sm transition-colors hover:border-[var(--outlines)] sm:p-7"
+                    key={story.id}
+                  >
                     <div>
-                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
-                        <span>TIER 01</span>
-                        <span>SCALING TEAMS</span>
-                      </div>
-
-                      <div className="mt-5">
-                        <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
-                          {growth.name}
-                        </h3>
-                        <p className="mt-1.5 text-[13.5px] leading-[1.52] text-[var(--text-secondary)]">
-                          {growth.description}
-                        </p>
-                      </div>
-
-                      <div className="my-6 flex items-baseline gap-1.5 border-y border-[var(--hairline)] py-4">
-                        <span className="text-[38px] font-semibold leading-none tracking-[-0.035em] tabular-nums text-[var(--ink)]">
-                          {growth.price}
+                      {/* Card Header Bar */}
+                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3">
+                        <span className="font-mono text-[10.5px] font-semibold tracking-[0.08em] text-[var(--text-secondary)]">
+                          CASE {indexLabel} / 04 · {story.company}
                         </span>
-                        <span className="font-mono text-[13px] text-[var(--text-secondary)]">
-                          {growth.period}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--pill-blue-soft)] px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-[var(--link)]">
+                          Verified Outcome
                         </span>
                       </div>
 
-                      <ul className="divide-y divide-[var(--hairline)]">
-                        {growth.features.map((feature) => (
-                          <li
-                            className="flex items-start gap-2.5 py-2.5 text-[13.5px] leading-[1.45] text-[var(--ink)] first:pt-0"
-                            key={feature}
-                          >
-                            <Check className="mt-0.5 size-3.5 shrink-0 text-[var(--pill-blue)]" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      {/* Pull Quote */}
+                      <blockquote className="my-5 text-[16px] font-normal leading-[1.55] tracking-[-0.012em] text-[var(--ink)] sm:text-[17.5px]">
+                        &ldquo;{story.quote}&rdquo;
+                      </blockquote>
+
+                      {/* Future Video Testimonial Extension Hook (Clean, no empty box or dead button) */}
+                      {story.video?.available && story.video.videoUrl && (
+                        <div className="my-4 overflow-hidden rounded-[8px] border border-[var(--hairline)]">
+                          <video
+                            className="w-full"
+                            controls
+                            poster={story.video.posterUrl}
+                            src={story.video.videoUrl}
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    <div className="mt-7 pt-2">
-                      <button
-                        className="apple-outline-pill-btn w-full py-3 text-[13px]"
-                        onClick={() =>
-                          openDemoModal(PLAN_LABEL_MAP[growth.id] ?? growth.name)
-                        }
-                        type="button"
-                      >
-                        {growth.ctaText}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ── TIER 02: SCALE — Authoritative Obsidian Commercial Centerpiece ── */}
-                  <div className="relative flex flex-col justify-between overflow-hidden rounded-[14px] border border-[#2c2c30] bg-[#141416] text-[#f5f5f7] lg:col-span-4">
-                    {/* Crisp 3px Precision Top Accent Rule */}
-                    <div aria-hidden="true" className="h-[3px] w-full bg-[#0071e3]" />
-
-                    <div className="flex flex-1 flex-col justify-between p-7 sm:p-8">
+                    {/* Card Footer: Metrics and Attribution */}
+                    <footer className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t border-[var(--hairline)] pt-4">
                       <div>
-                        <div className="flex items-center justify-between border-b border-[#26262a] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em]">
-                          <span className="text-[#98989d]">TIER 02 · MOST SELECTED</span>
-                          <span className="font-semibold text-[#2997ff]">
-                            RECOMMENDED
-                          </span>
-                        </div>
-
-                        <div className="mt-5">
-                          <h3 className="text-[26px] font-semibold tracking-[-0.025em] text-white">
-                            {scale.name}
-                          </h3>
-                          <p className="mt-2 text-[14px] leading-[1.55] text-[#a1a1a6]">
-                            {scale.description}
-                          </p>
-                        </div>
-
-                        <div className="my-6 flex items-baseline gap-1.5 border-y border-[#26262a] py-5">
-                          <span className="text-[48px] font-semibold leading-none tracking-[-0.04em] tabular-nums text-white">
-                            {scale.price}
-                          </span>
-                          <span className="font-mono text-[14px] text-[#98989d]">
-                            {scale.period}
-                          </span>
-                        </div>
-
-                        <ul className="space-y-3">
-                          {scale.features.map((feature) => (
-                            <li
-                              className="flex items-start gap-2.5 text-[14px] leading-[1.48] text-[#e5e5ea]"
-                              key={feature}
-                            >
-                              <Check className="mt-0.5 size-4 shrink-0 text-[#2997ff]" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="mt-8 pt-3">
-                        <button
-                          className="apple-pill-btn w-full py-3.5 text-[13.5px]"
-                          onClick={() =>
-                            openDemoModal(PLAN_LABEL_MAP[scale.id] ?? scale.name)
-                          }
-                          type="button"
-                        >
-                          {scale.ctaText}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── TIER 03: ENTERPRISE — Consultative Tailored Dossier ── */}
-                  <div className="flex flex-col justify-between rounded-[12px] border border-[var(--dividers)] bg-[var(--alt-band)] p-6 transition-colors hover:border-[var(--outlines)] lg:col-span-4 lg:my-3 lg:p-7">
-                    <div>
-                      <div className="flex items-center justify-between border-b border-dashed border-[var(--dividers)] pb-3 font-mono text-[10.5px] uppercase tracking-[0.09em] text-[var(--text-secondary)]">
-                        <span>TIER 03</span>
-                        <span>BESPOKE DEPLOYMENT</span>
-                      </div>
-
-                      <div className="mt-5">
-                        <h3 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
-                          {enterprise.name}
-                        </h3>
-                        <p className="mt-1.5 text-[13.5px] leading-[1.52] text-[var(--text-secondary)]">
-                          {enterprise.description}
+                        <p className="text-[14px] font-semibold text-[var(--ink)]">
+                          {story.author}
+                        </p>
+                        <p className="text-[12px] text-[var(--text-secondary)]">
+                          {story.role} · {story.company}
                         </p>
                       </div>
 
-                      <div className="my-6 flex items-baseline justify-between border-y border-dashed border-[var(--dividers)] py-4">
-                        <span className="text-[36px] font-semibold leading-none tracking-[-0.03em] text-[var(--ink)]">
-                          {enterprise.price}
-                        </span>
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.07em] text-[var(--link)]">
-                          TAILORED SLA
-                        </span>
+                      <div className="text-right">
+                        <p className="text-[26px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--link)] sm:text-[30px]">
+                          {metricValue}
+                        </p>
+                        <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
+                          {metricRest}
+                        </p>
                       </div>
-
-                      <ul className="space-y-3">
-                        {enterprise.features.map((feature, fIdx) => (
-                          <li
-                            className="flex items-start gap-2.5 text-[13.5px] leading-[1.45] text-[var(--ink)]"
-                            key={feature}
-                          >
-                            <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold text-[var(--text-secondary)]">
-                              {String(fIdx + 1).padStart(2, "0")}
-                            </span>
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="mt-7 pt-2">
-                      <button
-                        className="apple-outline-pill-btn w-full py-3 text-[13px]"
-                        onClick={() =>
-                          openDemoModal(
-                            PLAN_LABEL_MAP[enterprise.id] ?? enterprise.name
-                          )
-                        }
-                        type="button"
-                      >
-                        {enterprise.ctaText}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+                    </footer>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            7. FINAL CTA — Cohesive Closing Statement with Signature Mark
+            7. FINAL CTA — Cohesive Closing Statement with Dual Action Paths
             ═════════════════════════════════════════════════════════════════════ */}
         <section
-          className="relative scroll-mt-[56px] overflow-hidden border-t border-[var(--hairline)] bg-[var(--canvas)] px-4 py-[96px] text-center sm:px-6 lg:py-[120px]"
+          className="relative scroll-mt-[56px] overflow-hidden border-t border-[var(--hairline)] bg-[var(--alt-band)] px-4 py-[96px] text-center sm:px-6 lg:py-[120px]"
           id="cta"
         >
           <div aria-hidden="true" className="cta-radial-lines" />
 
           <div className="relative z-10 mx-auto flex max-w-[780px] flex-col items-center">
-            <div className="mb-8 flex size-[132px] items-center justify-center">
+            <div className="mb-8 flex size-[120px] items-center justify-center">
               <AIOrbFace
-                aria-label="SandipAI signature emblem"
+                aria-label="ORYNVAI signature emblem"
                 colors={orbColors}
                 gaze={true}
                 interactive={true}
                 showRing={true}
-                size={132}
+                size={120}
                 state="idle"
               />
             </div>
@@ -1005,67 +754,87 @@ export default function Home() {
               {SITE_CONTENT.finalCta.body}
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-5">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <button
-                className="apple-pill-btn px-8 py-3.5 text-[14px]"
-                onClick={() => openDemoModal()}
+                className="apple-pill-btn flex items-center gap-2 px-8 py-3.5 text-[14px]"
+                onClick={openBookingModal}
                 type="button"
               >
-                {SITE_CONTENT.finalCta.ctaText}
+                <Calendar className="size-4" />
+                <span>{SITE_CONTENT.finalCta.ctaBooking}</span>
               </button>
-              <LearnMoreLink href="#pricing">Compare plans</LearnMoreLink>
+
+              <button
+                className="apple-outline-pill-btn flex items-center gap-2 px-6 py-3.5 text-[14px]"
+                onClick={openVapiModal}
+                type="button"
+              >
+                <Mic className="size-4 text-[var(--link)]" />
+                <span>{SITE_CONTENT.finalCta.ctaVapi}</span>
+              </button>
             </div>
           </div>
         </section>
       </main>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          8. FOOTER — Comfortable Readability, Working Anchors & Theme Toggle
+          8. SIMPLIFIED FOOTER — Clean, Compact & Essential
           ═══════════════════════════════════════════════════════════════════════ */}
       <footer
-        className="border-t border-[var(--dividers)] bg-[var(--alt-band)] px-4 pt-12 pb-16 text-[var(--text-secondary)] sm:px-6"
+        className="border-t border-[var(--dividers)] bg-[var(--surface)] px-4 py-12 text-[var(--text-secondary)] sm:px-6"
         id="footer"
       >
         <div className="mx-auto max-w-[1080px]">
-          {/* Numbered Footnotes */}
-          <div className="space-y-2.5 border-b border-[var(--dividers)] pb-8 text-[12px] leading-[1.6]">
-            {SITE_CONTENT.footer.notes.map((note, idx) => (
-              <p key={idx}>{note}</p>
-            ))}
-          </div>
-
-          {/* Directory Columns */}
-          <div className="grid grid-cols-2 gap-8 border-b border-[var(--dividers)] py-10 md:grid-cols-4">
-            {SITE_CONTENT.footer.directory.map((col) => (
-              <div key={col.title}>
-                <h4 className="mb-3.5 text-[13px] font-semibold text-[var(--ink)]">
-                  {col.title}
-                </h4>
-                <ul className="space-y-2.5">
-                  {col.links.map((link) => (
-                    <li key={`${col.title}-${link.label}`}>
-                      <a
-                        className="text-[13px] text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)] hover:underline hover:underline-offset-4"
-                        href={link.href}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+          {/* Main Footer Row */}
+          <div className="flex flex-col justify-between gap-8 pb-8 md:flex-row md:items-center">
+            <div className="max-w-[420px]">
+              <div className="flex items-center gap-2.5 text-[17px] font-bold tracking-[-0.03em] text-[var(--ink)]">
+                <div className="relative size-6 shrink-0">
+                  <Image
+                    alt="ORYNVAI logo"
+                    className="size-6 object-contain dark:hidden"
+                    height={24}
+                    src="/orynvai-logo-black.png"
+                    width={24}
+                  />
+                  <Image
+                    alt="ORYNVAI logo"
+                    className="hidden size-6 object-contain dark:block"
+                    height={24}
+                    src="/orynvai-logo-white.png"
+                    width={24}
+                  />
+                </div>
+                <span>{SITE_CONTENT.footer.brand}</span>
               </div>
-            ))}
+              <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                {SITE_CONTENT.footer.description}
+              </p>
+            </div>
+
+            {/* Essential Nav Links */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {SITE_CONTENT.footer.essentialLinks.map((link) => (
+                <a
+                  className="text-[13px] text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)]"
+                  href={link.href}
+                  key={link.label}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Bottom Legal Bar & Appearance Toggle */}
-          <div className="flex flex-col items-start justify-between gap-5 pt-7 text-[12px] md:flex-row md:items-center">
+          {/* Legal Bar (Theme toggle strictly moved to top-right header) */}
+          <div className="flex flex-col items-start justify-between gap-4 border-t border-[var(--hairline)] pt-6 text-[12px] md:flex-row md:items-center">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               <span className="font-medium text-[var(--ink-muted)]">
                 {SITE_CONTENT.footer.legal.copyright}
               </span>
               {SITE_CONTENT.footer.legal.links.map((item) => (
                 <a
-                  className="text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)] hover:underline"
+                  className="text-[var(--text-secondary)] transition-colors hover:text-[var(--ink)]"
                   href={item.href}
                   key={item.label}
                 >
@@ -1073,28 +842,20 @@ export default function Home() {
                 </a>
               ))}
             </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                Appearance
-              </span>
-              <ThemeToggle
-                onThemeChange={handleThemeChange}
-                showSystem={false}
-                size="sm"
-                theme={theme}
-                variant="sun-moon"
-              />
-            </div>
           </div>
         </div>
       </footer>
 
-      {/* Interactive Live Demo Modal */}
-      <DemoModal
-        initialPlan={selectedPlan}
-        isOpen={demoModalOpen}
-        onClose={() => setDemoModalOpen(false)}
+      {/* Option A: Book a Sales Call Modal */}
+      <BookingModal
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+      />
+
+      {/* Option B: Talk to ORYNVAI Voice Modal */}
+      <VapiVoiceModal
+        isOpen={vapiModalOpen}
+        onClose={() => setVapiModalOpen(false)}
       />
     </div>
   );

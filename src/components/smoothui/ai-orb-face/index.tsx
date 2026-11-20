@@ -125,7 +125,7 @@ const DEFAULT_COLORS = {
 };
 
 /**
- * SandipAI Optical Character — a precision-engineered intelligence signature.
+ * ORYNVAI Optical Character — a precision-engineered intelligence signature.
  *
  * Built around an OkLab WebGL2 sphere with an optical glass rim, calibrated
  * telemetry bezel, and dual-layer gaze-tracking lenses with subtle depth
@@ -574,7 +574,7 @@ const AIOrbFace = ({
         role={ariaLabel ? "img" : undefined}
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
       >
-        <title>{ariaLabel ?? "SandipAI autonomous sales agent"}</title>
+        <title>{ariaLabel ?? "ORYNVAI autonomous sales agent"}</title>
         <defs>
           <linearGradient id={`bezel-${uid}`} x1="0%" x2="100%" y1="0%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
