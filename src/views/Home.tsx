@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import gsap from "gsap";
 import PagePreloader from "@/components/smoothui/page-preloader";
 import ThemeToggle from "@/components/smoothui/theme-toggle";
@@ -10,11 +9,6 @@ import AIOrbFace from "@/components/smoothui/ai-orb-face";
 import LearnMoreLink from "@/components/orynvai/LearnMoreLink";
 import ContinuousProductFilm from "@/components/orynvai/ContinuousProductFilm";
 import VisualCostComparison from "@/components/orynvai/VisualCostComparison";
-import {
-  ConversationalIntelligenceVisual,
-  EcosystemSyncVisual,
-  PipelineVelocityVisual,
-} from "@/components/orynvai/FeatureVisuals";
 import BookingModal from "@/components/orynvai/BookingModal";
 import VapiVoiceModal from "@/components/orynvai/VapiVoiceModal";
 import { SITE_CONTENT } from "@/content/site";
@@ -24,21 +18,6 @@ import {
   Mic,
   Calendar,
 } from "lucide-react";
-
-const DynamicKineticTypeScroll = dynamic(
-  () => import("@/components/smoothui/kinetic-type-scroll"),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="mx-auto max-w-[820px] text-center text-[30px] font-semibold leading-[1.16] tracking-[-0.025em] text-[var(--ink)] opacity-75 sm:text-[44px]"
-      >
-        {SITE_CONTENT.kineticBand.join(" ")}
-      </div>
-    ),
-  }
-);
 
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
@@ -240,7 +219,7 @@ export default function Home() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          1. STICKY GLOBAL NAVIGATION (48px authoritative bar, brand & CTAs + Theme in Top-Right)
+          1. STICKY GLOBAL NAVIGATION
           ═══════════════════════════════════════════════════════════════════════ */}
       <nav
         aria-label="Global"
@@ -304,7 +283,7 @@ export default function Home() {
             >
               {SITE_CONTENT.globalNav.ctaBooking}
             </button>
-            <div className="ml-1 pl-2 border-l border-[var(--dividers)]">
+            <div className="ml-1 border-l border-[var(--dividers)] pl-2">
               <ThemeToggle
                 onThemeChange={handleThemeChange}
                 showSystem={false}
@@ -408,7 +387,7 @@ export default function Home() {
 
       <main id="main-content">
         {/* ═════════════════════════════════════════════════════════════════════
-            2. OUTCOME-LED HERO SECTION (The customer is the hero)
+            2. OUTCOME-LED HERO SECTION
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="bg-micro-grid relative overflow-hidden px-4 pt-12 pb-16 [contain:paint] sm:px-6 md:flex md:min-h-[min(calc(100svh-48px),780px)] md:items-center md:py-16 lg:px-8"
@@ -418,7 +397,7 @@ export default function Home() {
           <div aria-hidden="true" className="hero-grid-lines" />
 
           <div className="relative z-10 mx-auto grid w-full max-w-[1080px] grid-cols-1 items-center gap-12 md:grid-cols-12 md:gap-8 lg:gap-12">
-            {/* Left Column: Composed Outcome Headline & Dual CTAs */}
+            {/* Left Column: Headline & CTAs */}
             <div className="flex flex-col items-start text-left md:col-span-7">
               <p className="hero-kicker apple-kicker mb-4 text-[var(--text-secondary)]">
                 {SITE_CONTENT.product.kicker}
@@ -469,7 +448,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Column: Signature ORYNVAI Optical Character & Operational Capsule */}
+            {/* Right Column: ORYNVAI Orb */}
             <div className="hero-orb-stage flex w-full max-w-full flex-col items-center justify-center md:col-span-5">
               <div
                 className="flex max-w-full items-center justify-center"
@@ -486,7 +465,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* Coverage Indicator: Replaced pricing capsule with operational outcome */}
+              {/* Coverage Indicator */}
               <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-[var(--dividers)] bg-[var(--surface)] px-4 py-1.5 text-[12px] font-medium text-[var(--text-secondary)] shadow-sm">
                 <span className="size-2 animate-pulse rounded-full bg-[var(--success)]" />
                 <span className="tabular-nums text-[var(--ink)]">
@@ -498,7 +477,7 @@ export default function Home() {
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            3. HOW IT WORKS — Continuous Interactive Product Film
+            3. HOW IT WORKS — Timed Auto-Playing Product Film
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="scroll-mt-[56px] bg-[var(--alt-band)] px-4 py-[88px] sm:px-6 lg:py-[104px]"
@@ -527,106 +506,7 @@ export default function Home() {
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            4. EDITORIAL FEATURE STORIES + KINETIC TYPOGRAPHY STATEMENT
-            ═════════════════════════════════════════════════════════════════════ */}
-        <section
-          className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
-          id="features"
-        >
-          <div className="mx-auto max-w-[1080px] space-y-[96px] lg:space-y-[120px]">
-            {/* Feature 1: Conversational Intelligence */}
-            <div
-              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
-              id="conversations"
-            >
-              <div className="lg:col-span-5">
-                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[0].kicker}
-                </p>
-                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
-                  {SITE_CONTENT.editorialSections[0].heading}
-                </h3>
-                <p className="apple-body mb-6 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[0].body}
-                </p>
-                <LearnMoreLink href={SITE_CONTENT.editorialSections[0].linkHref}>
-                  {SITE_CONTENT.editorialSections[0].linkText}
-                </LearnMoreLink>
-              </div>
-              <div className="lg:col-span-7">
-                <ConversationalIntelligenceVisual
-                  statsBadge={SITE_CONTENT.editorialSections[0].statsBadge}
-                />
-              </div>
-            </div>
-
-            {/* Editorial Kinetic Typography Moment */}
-            <div className="border-y border-[var(--dividers)] py-16 sm:py-20">
-              <div className="mx-auto max-w-[880px]">
-                <DynamicKineticTypeScroll
-                  align="center"
-                  className="text-[30px] font-semibold leading-[1.15] tracking-[-0.028em] text-[var(--ink)] sm:text-[42px] lg:text-[48px]"
-                  words={SITE_CONTENT.kineticBand}
-                />
-              </div>
-            </div>
-
-            {/* Feature 2: Pipeline Velocity */}
-            <div
-              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
-              id="pipeline"
-            >
-              <div className="order-2 lg:order-1 lg:col-span-7">
-                <PipelineVelocityVisual
-                  statsBadge={SITE_CONTENT.editorialSections[1].statsBadge}
-                />
-              </div>
-              <div className="order-1 lg:order-2 lg:col-span-5">
-                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[1].kicker}
-                </p>
-                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
-                  {SITE_CONTENT.editorialSections[1].heading}
-                </h3>
-                <p className="apple-body mb-6 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[1].body}
-                </p>
-                <LearnMoreLink href={SITE_CONTENT.editorialSections[1].linkHref}>
-                  {SITE_CONTENT.editorialSections[1].linkText}
-                </LearnMoreLink>
-              </div>
-            </div>
-
-            {/* Feature 3: Ecosystem Sync */}
-            <div
-              className="grid scroll-mt-[72px] grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12"
-              id="integrations"
-            >
-              <div className="lg:col-span-5">
-                <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[2].kicker}
-                </p>
-                <h3 className="apple-feature-heading mb-4 text-[var(--ink)]">
-                  {SITE_CONTENT.editorialSections[2].heading}
-                </h3>
-                <p className="apple-body mb-6 text-[var(--text-secondary)]">
-                  {SITE_CONTENT.editorialSections[2].body}
-                </p>
-                <LearnMoreLink href={SITE_CONTENT.editorialSections[2].linkHref}>
-                  {SITE_CONTENT.editorialSections[2].linkText}
-                </LearnMoreLink>
-              </div>
-              <div className="lg:col-span-7">
-                <EcosystemSyncVisual
-                  statsBadge={SITE_CONTENT.editorialSections[2].statsBadge}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═════════════════════════════════════════════════════════════════════
-            5. HUMAN VS ORYNVAI COST COMPARISON (Visual 24/7 Dial & Economic Value)
+            4. COVERAGE COMPARISON (Visual Dial — No fabricated numbers)
             ═════════════════════════════════════════════════════════════════════ */}
         <section
           className="scroll-mt-[56px] border-t border-[var(--dividers)] bg-[var(--alt-band)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
@@ -636,99 +516,10 @@ export default function Home() {
         </section>
 
         {/* ═════════════════════════════════════════════════════════════════════
-            6. CUSTOMER REVIEWS (Clean Non-Overlapping Responsive Grid)
+            5. FINAL CTA — Closing Statement with Dual Action Paths
             ═════════════════════════════════════════════════════════════════════ */}
         <section
-          className="scroll-mt-[56px] bg-[var(--canvas)] px-4 py-[96px] sm:px-6 lg:py-[112px]"
-          id="customers"
-        >
-          <div className="mx-auto max-w-[1080px]">
-            <div className="mb-12 text-center">
-              <p className="apple-kicker mb-2.5 text-[var(--text-secondary)]">
-                Customer Proof
-              </p>
-              <h2 className="apple-feature-heading mb-4 text-[var(--ink)]">
-                Proven on modern revenue floors.
-              </h2>
-              <p className="apple-body mx-auto max-w-[540px] text-[var(--text-secondary)]">
-                Browse verified qualification metrics from revenue teams scaling inbound capacity.
-              </p>
-            </div>
-
-            {/* Clean 2x2 Non-Overlapping Responsive Grid */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {SITE_CONTENT.stories.map((story, idx) => {
-                const indexLabel = String(idx + 1).padStart(2, "0");
-                const metricParts = story.metric.split(" ");
-                const metricValue = metricParts[0];
-                const metricRest = metricParts.slice(1).join(" ");
-
-                return (
-                  <article
-                    className="flex flex-col justify-between rounded-[14px] border border-[var(--dividers)] bg-[var(--surface)] p-6 text-left shadow-sm transition-colors hover:border-[var(--outlines)] sm:p-7"
-                    key={story.id}
-                  >
-                    <div>
-                      {/* Card Header Bar */}
-                      <div className="flex items-center justify-between border-b border-[var(--hairline)] pb-3">
-                        <span className="font-mono text-[10.5px] font-semibold tracking-[0.08em] text-[var(--text-secondary)]">
-                          CASE {indexLabel} / 04 · {story.company}
-                        </span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--pill-blue-soft)] px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-[var(--link)]">
-                          Verified Outcome
-                        </span>
-                      </div>
-
-                      {/* Pull Quote */}
-                      <blockquote className="my-5 text-[16px] font-normal leading-[1.55] tracking-[-0.012em] text-[var(--ink)] sm:text-[17.5px]">
-                        &ldquo;{story.quote}&rdquo;
-                      </blockquote>
-
-                      {/* Future Video Testimonial Extension Hook (Clean, no empty box or dead button) */}
-                      {story.video?.available && story.video.videoUrl && (
-                        <div className="my-4 overflow-hidden rounded-[8px] border border-[var(--hairline)]">
-                          <video
-                            className="w-full"
-                            controls
-                            poster={story.video.posterUrl}
-                            src={story.video.videoUrl}
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Card Footer: Metrics and Attribution */}
-                    <footer className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t border-[var(--hairline)] pt-4">
-                      <div>
-                        <p className="text-[14px] font-semibold text-[var(--ink)]">
-                          {story.author}
-                        </p>
-                        <p className="text-[12px] text-[var(--text-secondary)]">
-                          {story.role} · {story.company}
-                        </p>
-                      </div>
-
-                      <div className="text-right">
-                        <p className="text-[26px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--link)] sm:text-[30px]">
-                          {metricValue}
-                        </p>
-                        <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-[var(--text-secondary)]">
-                          {metricRest}
-                        </p>
-                      </div>
-                    </footer>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ═════════════════════════════════════════════════════════════════════
-            7. FINAL CTA — Cohesive Closing Statement with Dual Action Paths
-            ═════════════════════════════════════════════════════════════════════ */}
-        <section
-          className="relative scroll-mt-[56px] overflow-hidden border-t border-[var(--hairline)] bg-[var(--alt-band)] px-4 py-[96px] text-center sm:px-6 lg:py-[120px]"
+          className="relative scroll-mt-[56px] overflow-hidden border-t border-[var(--hairline)] bg-[var(--canvas)] px-4 py-[96px] text-center sm:px-6 lg:py-[120px]"
           id="cta"
         >
           <div aria-hidden="true" className="cta-radial-lines" />
@@ -778,7 +569,7 @@ export default function Home() {
       </main>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          8. SIMPLIFIED FOOTER — Clean, Compact & Essential
+          6. SIMPLIFIED FOOTER
           ═══════════════════════════════════════════════════════════════════════ */}
       <footer
         className="border-t border-[var(--dividers)] bg-[var(--surface)] px-4 py-12 text-[var(--text-secondary)] sm:px-6"
@@ -826,7 +617,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Legal Bar (Theme toggle strictly moved to top-right header) */}
+          {/* Legal Bar */}
           <div className="flex flex-col items-start justify-between gap-4 border-t border-[var(--hairline)] pt-6 text-[12px] md:flex-row md:items-center">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               <span className="font-medium text-[var(--ink-muted)]">
@@ -846,13 +637,13 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Option A: Book a Sales Call Modal */}
+      {/* Book a Sales Call Modal */}
       <BookingModal
         isOpen={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
       />
 
-      {/* Option B: Talk to ORYNVAI Voice Modal */}
+      {/* Talk to ORYNVAI Voice Modal */}
       <VapiVoiceModal
         isOpen={vapiModalOpen}
         onClose={() => setVapiModalOpen(false)}
